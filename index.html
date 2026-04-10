@@ -1,407 +1,173 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>사내 행사 추첨 시스템</title>
-  <style>
-    /* 외부 CSS 없이 순수 CSS로 네온/사이버펑크 테마 구현 */
-    :root {
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --text: #e2e8f0;
-      --cyan: #00ffff;
-      --cyan-glow: 0 0 10px rgba(0, 255, 255, 0.3);
-      --track1: #1e293b;
-      --track2: #334155;
-    }
-    body {
-      margin: 0; padding: 20px;
-      background-color: var(--bg); color: var(--text);
-      font-family: 'Malgun Gothic', sans-serif;
-      display: flex; height: 100vh; box-sizing: border-box; overflow: hidden;
-    }
-    .layout { display: flex; width: 100%; gap: 20px; }
-   
-    /* 좌측 컨트롤 패널 */
-    .sidebar {
-      width: 320px; background: var(--panel); padding: 20px;
-      border-radius: 8px; border: 1px solid var(--cyan);
-      box-shadow: var(--cyan-glow); display: flex; flex-direction: column;
-    }
-    .sidebar label { font-size: 13px; color: var(--cyan); margin-bottom: 5px; display: block; }
-    textarea, input {
-      width: 100%; box-sizing: border-box; background: #0f172a; color: white;
-      border: 1px solid #475569; padding: 10px; margin-bottom: 15px; border-radius: 4px;
-      outline: none;
-    }
-    textarea:focus, input:focus { border-color: var(--cyan); }
-   
-    button {
-      background: transparent; border: 1px solid var(--cyan); color: var(--cyan);
-      padding: 12px; cursor: pointer; border-radius: 4px; font-weight: bold;
-      transition: all 0.2s; text-align: center; width: 100%; margin-bottom: 10px;
-    }
-    button:hover:not(:disabled) { background: var(--cyan); color: #000; box-shadow: var(--cyan-glow); }
-    button:disabled { border-color: #475569; color: #475569; cursor: not-allowed; }
-   
-    .title { color: var(--cyan); text-align: center; text-shadow: 0 0 5px var(--cyan); margin-top: 0; letter-spacing: 2px;}
-   
-    /* 우측 메인 뷰 */
-    .main {
-      flex: 1; background: var(--panel); padding: 20px;
-      border-radius: 8px; border: 1px solid #475569; position: relative;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
-    }
-   
-    /* 레이싱 애니메이션 */
-    .track {
-      width: 100%; height: 100%; overflow-y: auto;
-      background: repeating-linear-gradient(90deg, var(--track1), var(--track1) 40px, var(--track2) 40px, var(--track2) 80px);
-      border-right: 4px dashed #facc15; padding: 10px; box-sizing: border-box; border-radius: 8px;
-    }
-    .runner {
-      position: relative; height: 32px; background: rgba(0,0,0,0.4);
-      margin-bottom: 8px; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 14px;
-    }
-    .bar {
-      position: absolute; left: 0; top: 0; height: 100%;
-      background: rgba(0, 255, 255, 0.8); border-radius: 4px; z-index: 1;
-      transition: width 0.05s linear;
-    }
-    .name { position: relative; z-index: 2; font-weight: bold; text-shadow: 1px 1px 2px black; }
-    .finish-text { position: absolute; right: 10px; z-index: 2; color: #facc15; font-weight: bold; display: none; }
-   
-    /* 모달 */
-    .modal {
-      position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95);
-      z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .modal h2 { color: #facc15; font-size: 2.5em; text-shadow: 0 0 15px rgba(250, 204, 21, 0.5); margin-bottom: 5px; }
-    .winner-list {
-      max-height: 50%; overflow-y: auto; width: 80%; max-width: 600px;
-      background: var(--bg); padding: 20px; border-radius: 8px; border: 1px solid var(--cyan); margin-bottom: 20px;
-    }
-    .winner-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid #334155;
-    }
-    .winner-item:last-child { border-bottom: none; }
-    .btn-red {
-      border-color: #ef4444; color: #ef4444; width: auto; padding: 6px 12px; margin: 0; font-size: 13px;
-    }
-    .btn-red:hover { background: #ef4444; color: white; box-shadow: 0 0 10px #ef4444; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MX Division Raffle System</title>
+    <style>
+        :root {
+            --bg: #0a0f1e;
+            --panel: #161e31;
+            --accent: #00f2ff;
+            --text: #ffffff;
+        }
+        body {
+            margin: 0; padding: 20px; font-family: sans-serif;
+            background: var(--bg); color: var(--text);
+            display: flex; height: 100vh; gap: 20px; box-sizing: border-box;
+        }
+        .sidebar {
+            width: 300px; background: var(--panel); padding: 20px;
+            border-radius: 12px; border: 1px solid var(--accent);
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .main {
+            flex: 1; background: var(--panel); border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative; overflow: hidden; border: 1px solid #2d3748;
+        }
+        textarea, input {
+            width: 100%; background: #0a0f1e; color: white; border: 1px solid #4a5568;
+            padding: 10px; border-radius: 6px; box-sizing: border-box;
+        }
+        button {
+            width: 100%; padding: 12px; cursor: pointer; border-radius: 6px;
+            font-weight: bold; background: transparent; color: var(--accent);
+            border: 1px solid var(--accent); transition: 0.2s;
+        }
+        button:hover { background: var(--accent); color: #000; }
+        #poolDisplay { font-size: 24px; color: var(--accent); font-weight: bold; text-align: center; }
+        .modal {
+            position: absolute; inset: 0; background: rgba(10, 15, 30, 0.95);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
+        }
+    </style>
 </head>
 <body>
-  <div class="layout">
     <div class="sidebar">
-      <h2 class="title">MX RAFFLE v1.2</h2>
-     
-      <label>1. 데이터 파싱 (이름만 넣어도 됨)</label>
-      <textarea id="dataInput" rows="5" placeholder="이름을 세로로 입력하세요&#10;이범준&#10;홍길동&#10;권나라"></textarea>
-      <button ON-CLICK="parseData()">데이터 갱신</button>
-     
-      <div style="background: #0f172a; padding: 10px; border: 1px solid #475569; border-radius: 4px; margin-bottom: 20px; display: flex; justify-content: space-between;">
-        <span style="color: #94a3b8; font-size: 14px;">현재 추첨 풀:</span>
-        <span id="poolCount" style="color: var(--cyan); font-weight: bold; font-size: 16px;">0 명</span>
-      </div>
-     
-      <label>2. 추첨 설정</label>
-      <input type="text" id="prizeName" placeholder="상품명 (예: 갤럭시 버즈)">
-      <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
-        <input type="number" id="prizeCount" value="1" min="1" style="margin-bottom: 0;">
-        <span style="font-size: 14px; white-space: nowrap;">명 추첨</span>
-      </div>
-     
-      <button ON-CLICK="readyDraw()" style="padding: 15px; font-size: 16px;">추첨 화면 준비</button>
-     
-      <div style="margin-top: auto;">
-        <button ON-CLICK="downloadCSV()" style="border-color: #22c55e; color: #22c55e;">최종 결과 CSV 다운로드</button>
-      </div>
+        <h2 style="color: var(--accent); margin-top: 0;">MX RAFFLE</h2>
+        <label>1. 명단 입력 (이름만 입력 가능)</label>
+        <textarea id="nameInput" rows="8" placeholder="이범준&#10;홍길동&#10;권나라"></textarea>
+        <button ON-CLICK="updateData()">데이터 갱신</button>
+        <div id="poolDisplay">0 명</div>
+        <hr style="width:100%; border: 0.5px solid #2d3748;">
+        <label>2. 상품 설정</label>
+        <input type="text" id="prizeTitle" placeholder="상품명 입력">
+        <input type="number" id="prizeQty" value="1" min="1">
+        <button ON-CLICK="prepareDraw()" style="font-size: 1.1em; border-width: 2px;">추첨 준비</button>
+        <button ON-CLICK="exportCSV()" style="margin-top: auto; border-color: #48bb78; color: #48bb78;">결과 CSV 저장</button>
     </div>
-   
-    <div class="main" id="mainArea">
-      <div style="text-align: center; color: #64748b;">
-        <h2 style="font-size: 24px;">대기 중</h2>
-        <p>좌측 패널에서 데이터를 입력하고 추첨을 준비하세요.</p>
-      </div>
-    </div>
-  </div>
 
-  <div class="modal" id="resultModal">
-    <h2>🎉 당첨 축하합니다! 🎉</h2>
-    <h3 id="modalPrize" style="color: var(--cyan); font-size: 24px; margin-bottom: 30px;"></h3>
-    <div class="winner-list" id="winnerList"></div>
-    <button ON-CLICK="confirmWinners()" style="width: auto; padding: 15px 40px; font-size: 18px; background: var(--cyan); color: #000;">
-      결과 확정 및 다음 추첨 진행
-    </button>
-  </div>
-
-  <script>
-    let pool = [];
-    let globalWinners = [];
-    let currentRoundWinners = [];
-    let isDrawing = false;
-    let reqId;
-
-    // 1. 데이터 파싱 (업그레이드 버전: 이름만 넣어도 가중치 1 자동 적용)
-    function parseData() {
-      const text = document.getElementById('dataInput').value;
-      const lines = text.split('\n');
-      pool = [];
-     
-      lines.forEach((line, idx) => {
-        const trimmed = line.trim();
-        if (!trimmed) return;
-       
-        // 정규식: 이름 뒤에 공백/탭/기호와 함께 숫자가 있으면 가중치로 인식, 없으면 이름만 추출
-        const match = trimmed.match(/^(.*?)(?:(?:\||\t|\s)+(\d+))?\s*$/);
-       
-        if (match) {
-          const name = match[1].trim();
-          const weight = match[2] ? parseInt(match[2], 10) : 1;
-         
-          if (name) {
-            pool.push({
-              id: 'p_' + idx + '_' + Math.random().toString(36).substr(2, 5),
-              name: name,
-              weight: weight
-            });
-          }
-        }
-      });
-     
-      document.getElementById('poolCount').innerText = pool.length + ' 명';
-      alert(`성공적으로 ${pool.length}명의 데이터를 파싱했습니다.`);
-    }
-
-    // 2. 추첨 준비
-    function readyDraw() {
-      const count = parseInt(document.getElementById('prizeCount').value);
-      const prize = document.getElementById('prizeName').value;
-     
-      if (pool.length < count) {
-        alert('추첨 인원이 현재 참가자 풀보다 많습니다.');
-        return;
-      }
-      if (!prize) {
-        alert('상품명을 입력해주세요.');
-        return;
-      }
-
-      const main = document.getElementById('mainArea');
-     
-      if (count === 1) {
-        main.innerHTML = `
-          <div style="position: relative; width: 450px; height: 450px; border-radius: 50%; box-shadow: 0 0 20px rgba(0,255,255,0.2); overflow: hidden; border: 2px solid var(--cyan);">
-            <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid white; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></div>
-            <canvas id="rouletteCanvas" width="450" height="450"></canvas>
-          </div>
-          <button id="drawBtn" ON-CLICK="spinRoulette()" style="width: 250px; padding: 15px; font-size: 20px; margin-top: 40px; border-radius: 30px;">🔥 추첨 시작 🔥</button>
-        `;
-        drawRouletteInitial();
-      } else {
-        let html = `<div class="track" id="trackArea">`;
-        pool.forEach(p => {
-          html += `
-            <div class="runner" id="runner_${p.id}">
-              <div class="bar"></div>
-              <span class="name">${p.name}</span>
-              <span class="finish-text">도착!</span>
-            </div>`;
-        });
-        html += `</div>
-          <button id="drawBtn" ON-CLICK="startRacing(${count})" style="position: absolute; bottom: 20px; width: 300px; padding: 15px; font-size: 20px; border-radius: 30px; background: var(--bg);">🏃 ${count}명 레이싱 시작 🏃</button>`;
-        main.innerHTML = html;
-      }
-    }
-
-    // 3. 룰렛 로직
-    function drawRouletteInitial() {
-      const canvas = document.getElementById('rouletteCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const totalWeight = pool.reduce((acc, p) => acc + p.weight, 0);
-      let startAngle = 0;
-     
-      ctx.clearRect(0, 0, 450, 450);
-      pool.forEach((p, i) => {
-        const slice = (p.weight / totalWeight) * 2 * Math.PI;
-        ctx.beginPath();
-        ctx.moveTo(225, 225);
-        ctx.arc(225, 225, 225, startAngle, startAngle + slice);
-        ctx.fillStyle = `hsl(${(i * 360) / pool.length}, 70%, 45%)`;
-        ctx.fill();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = '#0f172a';
-        ctx.stroke();
-        startAngle += slice;
-      });
-    }
-
-    function spinRoulette() {
-      if (isDrawing) return;
-      isDrawing = true;
-      document.getElementById('drawBtn').innerText = "추첨 중...";
-      document.getElementById('drawBtn').disabled = true;
-
-      const totalWeight = pool.reduce((acc, p) => acc + p.weight, 0);
-      let r = Math.random() * totalWeight;
-      let winnerIdx = 0;
-      for (let i = 0; i < pool.length; i++) {
-        r -= pool[i].weight;
-        if (r <= 0) { winnerIdx = i; break; }
-      }
-
-      const canvas = document.getElementById('rouletteCanvas');
-      const duration = 5000;
-      const start = performance.now();
-      const extraRotations = Math.PI * 2 * 10;
-      const targetRotation = extraRotations + Math.random() * Math.PI * 2;
-
-      function animate(time) {
-        let progress = (time - start) / duration;
-        if (progress > 1) progress = 1;
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const currentRotation = targetRotation * easeOut;
-       
-        canvas.style.transform = `rotate(${currentRotation}rad)`;
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          isDrawing = false;
-          showResult([pool[winnerIdx]]);
-        }
-      }
-      requestAnimationFrame(animate);
-    }
-
-    // 4. 레이싱 로직
-    function startRacing(count) {
-      if (isDrawing) return;
-      isDrawing = true;
-      document.getElementById('drawBtn').innerText = "레이싱 진행 중...";
-      document.getElementById('drawBtn').disabled = true;
-
-      let runnersData = pool.map(p => ({ ...p, progress: 0 }));
-      let winners = [];
-
-      function frame() {
-        runnersData.forEach(r => {
-          if (r.progress >= 100) return;
-          const speed = (Math.random() * 0.5) + (r.weight * 0.04);
-          r.progress += speed;
-         
-          if (r.progress >= 100) {
-            r.progress = 100;
-            if (!winners.find(w => w.id === r.id)) {
-              winners.push(r);
-              document.querySelector(`#runner_${r.id} .finish-text`).style.display = 'block';
-            }
-          }
-         
-          const bar = document.querySelector(`#runner_${r.id} .bar`);
-          if (bar) bar.style.width = r.progress + '%';
-        });
-
-        if (winners.length < count) {
-          reqId = requestAnimationFrame(frame);
-        } else {
-          isDrawing = false;
-          setTimeout(() => showResult(winners.slice(0, count)), 500);
-        }
-      }
-      reqId = requestAnimationFrame(frame);
-    }
-
-    // 5. 결과 모달 및 재추첨 로직
-    function showResult(winners) {
-      const prize = document.getElementById('prizeName').value;
-      currentRoundWinners = winners.map(w => ({ ...w, prize: prize }));
-      document.getElementById('modalPrize').innerText = `[ ${prize} ]`;
-      renderWinnerList();
-      document.getElementById('resultModal').style.display = 'flex';
-    }
-
-    function renderWinnerList() {
-      const list = document.getElementById('winnerList');
-      list.innerHTML = '';
-      currentRoundWinners.forEach(w => {
-        list.innerHTML += `
-          <div class="winner-item">
-            <span style="font-size: 1.3em; font-weight: bold;">${w.name}</span>
-            <button class="btn-red" ON-CLICK="redrawExclude('${w.id}')">부재자 제외 재추첨</button>
-          </div>
-        `;
-      });
-    }
-
-    function redrawExclude(targetId) {
-      currentRoundWinners = currentRoundWinners.filter(w => w.id !== targetId);
-     
-      if (pool.length === 0) {
-        alert('더 이상 추첨 가능한 인원이 풀에 없습니다.');
-        return;
-      }
-     
-      const totalWeight = pool.reduce((acc, p) => acc + p.weight, 0);
-      let r = Math.random() * totalWeight;
-      let newWinner = pool[0];
-      for (let i = 0; i < pool.length; i++) {
-        r -= pool[i].weight;
-        if (r <= 0) { newWinner = pool[i]; break; }
-      }
-     
-      const prize = document.getElementById('prizeName').value;
-      const newWinnerObj = { ...newWinner, prize: prize };
-     
-      pool = pool.filter(p => p.id !== newWinner.id);
-      document.getElementById('poolCount').innerText = pool.length + ' 명';
-     
-      currentRoundWinners.push(newWinnerObj);
-      renderWinnerList();
-    }
-
-    function confirmWinners() {
-      globalWinners.push(...currentRoundWinners);
-     
-      const winnerIds = currentRoundWinners.map(w => w.id);
-      pool = pool.filter(p => !winnerIds.includes(p.id));
-      document.getElementById('poolCount').innerText = pool.length + ' 명';
-     
-      currentRoundWinners = [];
-      document.getElementById('prizeName').value = "";
-      document.getElementById('resultModal').style.display = 'none';
-     
-      document.getElementById('mainArea').innerHTML = `
-        <div style="text-align: center; color: #64748b;">
-          <h2 style="font-size: 24px;">다음 추첨 대기 중</h2>
-          <p>좌측 패널에서 상품명과 인원을 세팅해주세요.</p>
+    <div class="main" id="drawArea">
+        <div style="color: #718096; text-align: center;">
+            <p style="font-size: 50px; margin: 0;">🎲</p>
+            <p>좌측에서 데이터를 입력하고 추첨을 시작하세요.</p>
         </div>
-      `;
-    }
+    </div>
 
-    // 6. CSV 다운로드
-    function downloadCSV() {
-      if (globalWinners.length === 0) {
-        alert('아직 확정된 당첨자가 없습니다.');
-        return;
-      }
-      let csvContent = "\uFEFF상품명,당첨자이름\n";
-      globalWinners.forEach(w => {
-        csvContent += `${w.prize},${w.name}\n`;
-      });
-     
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", "최종_당첨자_리스트.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  </script>
+    <div class="modal" id="resultModal">
+        <h1 id="winnerAnnounce" style="color: #f6e05e; font-size: 3em; margin-bottom: 10px;">당첨자!</h1>
+        <div id="winnerNames" style="font-size: 1.5em; margin-bottom: 30px; text-align: center;"></div>
+        <button ON-CLICK="closeModal()" style="width: auto; padding: 15px 50px;">확인 및 다음 추첨</button>
+    </div>
+
+    <script>
+        let participants = [];
+        let finalWinners = [];
+
+        function updateData() {
+            const raw = document.getElementById('nameInput').value.trim();
+            if (!raw) { alert("명단을 입력해주세요."); return; }
+           
+            const lines = raw.split('\n');
+            participants = lines.map((line, i) => {
+                const parts = line.split(/\s+/);
+                const name = parts[0];
+                const weight = parseInt(parts[1]) || 1;
+                return { id: i, name: name, weight: weight };
+            }).filter(p => p.name);
+
+            document.getElementById('poolDisplay').innerText = participants.length + " 명";
+            console.log("파싱 결과:", participants);
+        }
+
+        function prepareDraw() {
+            const qty = parseInt(document.getElementById('prizeQty').value);
+            const prize = document.getElementById('prizeTitle').value;
+            if (participants.length < qty) { alert("인원이 부족합니다."); return; }
+            if (!prize) { alert("상품명을 입력하세요."); return; }
+
+            const drawArea = document.getElementById('drawArea');
+            drawArea.innerHTML = `
+                <h2 style="color: var(--accent); margin-bottom: 40px;">${prize} 추첨 (${qty}명)</h2>
+                <div id="visualizer" style="width: 80%; text-align: center; font-size: 2em; font-weight: bold; min-height: 100px;">
+                    버튼을 누르면 추첨이 시작됩니다.
+                </div>
+                <button ON-CLICK="startDraw(${qty}, '${prize}')" style="width: 300px; padding: 20px; font-size: 24px; margin-top: 40px; border-radius: 50px;">START</button>
+            `;
+        }
+
+        function startDraw(qty, prize) {
+            let tempPool = [...participants];
+            let winners = [];
+
+            for (let i = 0; i < qty; i++) {
+                let totalWeight = tempPool.reduce((s, p) => s + p.weight, 0);
+                let random = Math.random() * totalWeight;
+                for (let j = 0; j < tempPool.length; j++) {
+                    random -= tempPool[j].weight;
+                    if (random <= 0) {
+                        winners.push(tempPool[j]);
+                        tempPool.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+
+            // 시각적 효과
+            const vis = document.getElementById('visualizer');
+            let count = 0;
+            const interval = setInterval(() => {
+                vis.innerText = participants[Math.floor(Math.random() * participants.length)].name;
+                count++;
+                if (count > 20) {
+                    clearInterval(interval);
+                    showFinalWinners(winners, prize);
+                }
+            }, 50);
+        }
+
+        function showFinalWinners(winners, prize) {
+            const modal = document.getElementById('resultModal');
+            const nameArea = document.getElementById('winnerNames');
+            nameArea.innerHTML = winners.map(w => `<div>${w.name}</div>`).join('');
+           
+            // 당첨자 처리 (중복 방지)
+            winners.forEach(w => {
+                finalWinners.push({ prize: prize, name: w.name });
+                participants = participants.filter(p => p.id !== w.id);
+            });
+           
+            document.getElementById('poolDisplay').innerText = participants.length + " 명";
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+            document.getElementById('drawArea').innerHTML = '<div style="color: #718096; text-align: center;"><p style="font-size: 50px; margin: 0;">🎲</p><p>다음 추첨을 준비하세요.</p></div>';
+        }
+
+        function exportCSV() {
+            if (finalWinners.length === 0) return;
+            let csv = "\uFEFF상품,당첨자\n";
+            finalWinners.forEach(row => csv += `${row.prize},${row.name}\n`);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '당첨자결과.csv';
+            a.click();
+        }
+    </script>
 </body>
 </html>
