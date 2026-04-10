@@ -45,11 +45,12 @@
 </head>
 <body>
     <div class="sidebar">
-        <h2 style="color: var(--accent); margin: 0; text-align: center; letter-spacing: 2px;">MX RAFFLE v1.5</h2>
+        <h2 style="color: var(--accent); margin: 0; text-align: center; letter-spacing: 2px;">MX RAFFLE v2.0</h2>
        
         <label style="font-size: 13px; color: #94a3b8;">1. 참가자 명단 입력 (한 줄에 한 명)</label>
         <textarea id="nameInput" rows="10" placeholder="이범준&#10;홍길동&#10;권나라"></textarea>
-        <button type="button" ON-CLICK="btnClickAction()">데이터 갱신</button>
+       
+        <button type="button" id="btnUpdateData">데이터 갱신</button>
        
         <div id="poolDisplay">0 명</div>
        
@@ -62,9 +63,9 @@
             <span style="white-space: nowrap; font-size: 14px;">명 추첨</span>
         </div>
        
-        <button type="button" ON-CLICK="prepareDraw()" style="background: rgba(0,242,255,0.1); border-width: 2px;">추첨 화면 준비</button>
+        <button type="button" id="btnPrepareDraw" style="background: rgba(0,242,255,0.1); border-width: 2px;">추첨 화면 준비</button>
        
-        <button type="button" ON-CLICK="exportCSV()" style="margin-top: auto; border-color: #48bb78; color: #48bb78;">최종 결과 CSV 저장</button>
+        <button type="button" id="btnExportCSV" style="margin-top: auto; border-color: #48bb78; color: #48bb78;">최종 결과 CSV 저장</button>
     </div>
 
     <div class="main" id="drawArea">
@@ -77,21 +78,18 @@
     <div class="modal" id="resultModal">
         <h1 id="winnerAnnounce" style="color: #f6e05e; font-size: 3.5em; margin-bottom: 10px; text-shadow: 0 0 20px rgba(246,224,94,0.4);">CONGRATS!</h1>
         <div id="winnerNames" style="font-size: 2em; margin-bottom: 40px; text-align: center; color: white; font-weight: bold;"></div>
-        <button ON-CLICK="closeModal()" style="width: auto; padding: 15px 60px; font-size: 20px;">확인</button>
+        <button type="button" id="btnCloseModal" style="width: auto; padding: 15px 60px; font-size: 20px;">확인 및 다음 추첨</button>
     </div>
 
     <script>
-        // 프로그램 시작 확인용 로그
-        console.log("Raffle Program Loaded Successfully!");
+        console.log("Raffle Program Loaded Successfully! (보안 우회 모드)");
 
         let participants = [];
         let finalWinners = [];
 
-        // 데이터 갱신 함수
-        function btnClickAction() {
-            console.log("데이터 갱신 버튼 클릭됨"); // 버튼 클릭 확인용
+        // 1. 데이터 갱신 이벤트 등록
+        document.getElementById('btnUpdateData').addEventListener('click', function() {
             const raw = document.getElementById('nameInput').value.trim();
-           
             if (!raw) {
                 alert("명단을 입력해주세요.");
                 return;
@@ -105,11 +103,10 @@
 
             document.getElementById('poolDisplay').innerText = participants.length + " 명";
             alert(participants.length + "명의 명단이 성공적으로 로드되었습니다.");
-            console.log("로드된 인원:", participants);
-        }
+        });
 
-        // 추첨 준비 화면 전환
-        function prepareDraw() {
+        // 2. 추첨 준비 이벤트 등록
+        document.getElementById('btnPrepareDraw').addEventListener('click', function() {
             const qty = parseInt(document.getElementById('prizeQty').value);
             const prize = document.getElementById('prizeTitle').value;
            
@@ -130,25 +127,28 @@
                     <div id="visualizer" style="font-size: 3em; font-weight: bold; color: white; min-height: 80px; text-shadow: 0 0 10px var(--accent);">
                         준비 완료
                     </div>
-                    <button ON-CLICK="startDraw(${qty}, '${prize}')" style="width: 280px; padding: 20px; font-size: 24px; margin-top: 50px; border-radius: 50px; cursor: pointer;">추첨 시작</button>
+                    <button type="button" id="btnStartDraw" style="width: 280px; padding: 20px; font-size: 24px; margin-top: 50px; border-radius: 50px; cursor: pointer;">추첨 시작</button>
                 </div>
             `;
-        }
 
-        // 실제 추첨 로직
+            // 새로 만들어진 '추첨 시작' 버튼에 이벤트 즉시 등록
+            document.getElementById('btnStartDraw').addEventListener('click', function() {
+                startDraw(qty, prize);
+            });
+        });
+
+        // 3. 실제 추첨 애니메이션 로직
         function startDraw(qty, prize) {
-            console.log("추첨 시작:", prize, qty, "명");
             let winners = [];
             let tempPool = [...participants];
 
-            // 랜덤 추출
+            // 당첨자 미리 선정
             for (let i = 0; i < qty; i++) {
                 const randomIndex = Math.floor(Math.random() * tempPool.length);
                 winners.push(tempPool[randomIndex]);
                 tempPool.splice(randomIndex, 1);
             }
 
-            // 시각적 효과 (슬롯머신 느낌)
             const vis = document.getElementById('visualizer');
             let spinCount = 0;
             const timer = setInterval(() => {
@@ -163,14 +163,14 @@
             }, 60);
         }
 
+        // 4. 모달창 띄우기 및 데이터 처리
         function showWinners(winners, prize) {
             const modal = document.getElementById('resultModal');
             const nameArea = document.getElementById('winnerNames');
            
-            // 결과창 표시
             nameArea.innerHTML = winners.map(w => `<div style="margin: 10px 0;">${w.name}</div>`).join('');
            
-            // 데이터 업데이트 (중복 당첨 방지)
+            // 중복 당첨을 방지하기 위해 전체 풀에서 당첨자 삭제
             winners.forEach(w => {
                 finalWinners.push({ prize: prize, name: w.name });
                 participants = participants.filter(p => p.id !== w.id);
@@ -180,7 +180,8 @@
             modal.style.display = 'flex';
         }
 
-        function closeModal() {
+        // 5. 확인 버튼 누르면 모달 닫기
+        document.getElementById('btnCloseModal').addEventListener('click', function() {
             document.getElementById('resultModal').style.display = 'none';
             document.getElementById('drawArea').innerHTML = `
                 <div style="color: #718096; text-align: center;">
@@ -188,9 +189,10 @@
                     <p style="font-size: 18px;">당첨자 확정 완료!<br>다음 상품 추첨을 준비하세요.</p>
                 </div>
             `;
-        }
+        });
 
-        function exportCSV() {
+        // 6. CSV 추출 이벤트 등록
+        document.getElementById('btnExportCSV').addEventListener('click', function() {
             if (finalWinners.length === 0) {
                 alert("저장할 당첨 데이터가 없습니다.");
                 return;
@@ -205,7 +207,7 @@
             a.href = url;
             a.download = 'Raffle_Results.csv';
             a.click();
-        }
+        });
     </script>
 </body>
 </html>
