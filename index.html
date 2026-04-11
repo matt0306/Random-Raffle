@@ -10,7 +10,7 @@
         
         :root {
             --bg-color: #050505;
-            --panel-bg: rgba(20, 25, 40, 0.6);
+            --panel-bg: rgba(20, 25, 40, 0.75);
             --accent-main: #00f0ff;
             --accent-sec: #ff0055;
             --accent-thr: #facc15;
@@ -20,111 +20,135 @@
 
         body {
             margin: 0; padding: 20px; font-family: 'Noto Sans KR', sans-serif;
-            background: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #1a0b2e 0%, #050505 70%);
-            color: var(--text-main); display: flex; height: 100vh; gap: 20px; box-sizing: border-box; overflow: hidden;
+            background: var(--bg-color); color: var(--text-main);
+            display: flex; height: 100vh; gap: 20px; box-sizing: border-box; overflow: hidden;
+            transition: background 0.5s ease;
         }
 
-        /* Glassmorphism Panel */
+        /* 게임 모드별 배경 설정 */
+        body.mode-racing { background: radial-gradient(circle at 50% 0%, #10182b 0%, #050505 80%); }
+        body.mode-pinball { background: radial-gradient(circle at 50% 0%, #2b1022 0%, #050505 80%); }
+        body.mode-wrestling { background: radial-gradient(circle at 50% 50%, #2b1010 0%, #050505 80%); }
+
         .sidebar {
-            width: 340px; background: var(--panel-bg); padding: 25px;
+            width: 350px; background: var(--panel-bg); padding: 25px;
             border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             z-index: 10; flex-shrink: 0;
         }
 
         .main {
             flex: 1; border-radius: 16px; position: relative;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px);
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.8); overflow: hidden;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9); overflow: hidden;
         }
 
         h2.brand {
-            font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 800;
+            font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 800;
             color: var(--text-main); text-align: center; margin: 0;
             text-shadow: 0 0 10px var(--accent-main), 0 0 20px var(--accent-main);
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
-        label { font-size: 12px; color: var(--accent-main); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;}
+        label { font-size: 13px; color: var(--accent-main); font-weight: bold; text-transform: uppercase; }
         
         textarea, input {
-            width: 100%; background: rgba(0,0,0,0.5); color: white;
+            width: 100%; background: rgba(0,0,0,0.6); color: white;
             border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;
-            box-sizing: border-box; outline: none; font-family: inherit; font-size: 14px;
+            box-sizing: border-box; outline: none; font-family: inherit; font-size: 15px;
             transition: all 0.3s ease;
         }
         textarea:focus, input:focus { border-color: var(--accent-main); box-shadow: 0 0 10px rgba(0,240,255,0.3); }
 
-        .mode-selector { display: flex; gap: 10px; margin-bottom: 10px; }
+        .mode-selector { display: flex; gap: 10px; margin-bottom: 5px; }
         .mode-btn {
-            flex: 1; padding: 10px 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
-            color: var(--text-muted); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;
+            flex: 1; padding: 12px 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-muted); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold;
             transition: 0.3s;
         }
         .mode-btn.active { background: rgba(0, 240, 255, 0.2); border-color: var(--accent-main); color: var(--text-main); text-shadow: 0 0 5px var(--accent-main); }
 
         button.action-btn {
-            width: 100%; padding: 16px; cursor: pointer; border-radius: 8px; font-weight: 800;
-            background: linear-gradient(45deg, transparent, rgba(0, 240, 255, 0.1));
+            width: 100%; padding: 18px; cursor: pointer; border-radius: 8px; font-weight: 800;
+            background: linear-gradient(45deg, transparent, rgba(0, 240, 255, 0.15));
             color: var(--accent-main); border: 1px solid var(--accent-main);
-            transition: all 0.3s; font-size: 16px; text-transform: uppercase; letter-spacing: 2px;
+            transition: all 0.3s; font-size: 18px; letter-spacing: 2px;
             font-family: 'Orbitron', 'Noto Sans KR', sans-serif;
         }
-        button.action-btn:hover:not(:disabled) { background: var(--accent-main); color: #000; box-shadow: 0 0 20px var(--accent-main); }
-        button.action-btn:disabled { border-color: #333; color: #555; cursor: not-allowed; background: transparent; box-shadow: none;}
+        button.action-btn:hover:not(:disabled) { background: var(--accent-main); color: #000; box-shadow: 0 0 25px var(--accent-main); }
+        button.action-btn:disabled { border-color: #333; color: #555; cursor: not-allowed; background: transparent; }
         
-        button.export-btn { border-color: #48bb78; color: #48bb78; }
+        button.export-btn { border-color: #48bb78; color: #48bb78; padding: 12px; font-size: 14px; }
         button.export-btn:hover { background: #48bb78; box-shadow: 0 0 20px #48bb78; }
 
-        #poolDisplay { font-size: 20px; color: var(--text-main); text-align: center; font-weight: bold; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        #poolDisplay { font-size: 22px; color: var(--text-main); text-align: center; font-weight: bold; padding: 12px; background: rgba(0,0,0,0.4); border-radius: 8px; }
 
-        /* Timer UI */
         #gameTimer {
-            position: absolute; top: 20px; right: 20px; font-family: 'Orbitron', sans-serif;
-            font-size: 30px; color: var(--accent-main); font-weight: 800; z-index: 5;
-            text-shadow: 0 0 10px var(--accent-main); display: none;
+            position: absolute; top: 25px; right: 30px; font-family: 'Orbitron', sans-serif;
+            font-size: 45px; color: var(--accent-main); font-weight: 800; z-index: 5;
+            text-shadow: 0 0 15px var(--accent-main); display: none;
         }
 
         canvas { display: block; width: 100%; height: 100%; }
 
         .modal {
-            position: absolute; inset: 0; background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(10px);
+            position: absolute; inset: 0; background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(15px);
             display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
         }
-        .modal h1 { font-family: 'Orbitron', sans-serif; color: var(--accent-thr); font-size: 5em; margin: 0 0 10px 0; text-shadow: 0 0 40px var(--accent-thr); }
-        .modal h2 { color: var(--text-main); font-size: 2em; margin-bottom: 30px; }
+        .modal h1 { font-family: 'Orbitron', sans-serif; color: var(--accent-thr); font-size: 6em; margin: 0 0 10px 0; text-shadow: 0 0 50px var(--accent-thr); }
+        .modal h2 { color: var(--text-main); font-size: 2.5em; margin-bottom: 40px; text-shadow: 0 0 10px #fff; }
+        
+        .winner-list {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
+            width: 80%; max-height: 50vh; overflow-y: auto; margin-bottom: 40px; padding: 10px;
+        }
+        .winner-card {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--accent-thr);
+            border-radius: 10px; padding: 15px; text-align: center;
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.2);
+        }
+        .rank-badge { font-family: 'Orbitron', sans-serif; color: var(--accent-thr); font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
+        .winner-name { font-size: 1.8em; font-weight: bold; color: white; }
+
+        /* 화면 흔들림 효과 */
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-3px, 3px); }
+            50% { transform: translate(3px, -3px); }
+            75% { transform: translate(-3px, -3px); }
+        }
+        .shake-active { animation: shake 0.2s infinite; }
     </style>
 </head>
-<body>
+<body class="mode-racing">
     <div class="sidebar">
         <h2 class="brand">MX ESPORTS</h2>
         
-        <label>1. 참가자 데이터 (이름 점수)</label>
-        <textarea id="nameInput" rows="5" placeholder="이범준 10&#10;홍길동 3&#10;권나라 1"></textarea>
-        <button type="button" class="action-btn" id="btnUpdateData" style="padding: 12px; font-size: 14px;">데이터 로드</button>
+        <label>1. 참가자 등록 (이름과 가중치)</label>
+        <textarea id="nameInput" rows="8" placeholder="이범준10&#10;홍길동 3&#10;권나라"></textarea>
+        <button type="button" class="action-btn" id="btnUpdateData" style="padding: 14px; font-size: 15px;">데이터 파싱</button>
         <div id="poolDisplay">0 명 대기중</div>
         
         <hr style="width:100%; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
         
-        <label>2. 게임 모드 선택</label>
+        <label>2. 게임 모드</label>
         <div class="mode-selector">
             <button class="mode-btn active" data-mode="racing">🏎️ 그랑프리</button>
-            <button class="mode-btn" data-mode="pinball">🎯 플링코</button>
+            <button class="mode-btn" data-mode="pinball">🎯 핀볼드롭</button>
             <button class="mode-btn" data-mode="wrestling">🤼 로얄럼블</button>
         </div>
 
-        <label>3. 라운드 설정</label>
-        <input type="text" id="prizeTitle" placeholder="상품명 입력">
+        <label>3. 라운드 세팅</label>
+        <input type="text" id="prizeTitle" placeholder="상품명 (예: 아이패드)">
         <div style="display: flex; gap: 10px; align-items: center;">
             <input type="number" id="prizeQty" value="1" min="1">
-            <span style="font-size: 14px; color: var(--text-muted); white-space: nowrap;">명 추첨</span>
+            <span style="font-size: 15px; color: var(--text-muted); font-weight: bold;">명 추출</span>
         </div>
         
-        <button type="button" class="action-btn" id="btnStartGame" style="margin-top: 10px;">🔥 GAME START</button>
-        <button type="button" class="action-btn export-btn" id="btnExportCSV" style="margin-top: auto;">엑셀 다운로드</button>
+        <button type="button" class="action-btn" id="btnStartGame" style="margin-top: 15px;">🚀 START GAME</button>
+        <button type="button" class="action-btn export-btn" id="btnExportCSV" style="margin-top: auto;">결과 엑셀 저장</button>
     </div>
 
     <div class="main" id="gameContainer">
@@ -135,8 +159,8 @@
     <div class="modal" id="resultModal">
         <h1>WINNER</h1>
         <h2 id="modalPrizeTitle"></h2>
-        <div id="winnerNames" style="font-size: 2.5em; margin-bottom: 40px; text-align: center; color: white; font-weight: bold; max-height: 40vh; overflow-y: auto;"></div>
-        <button type="button" class="action-btn" id="btnCloseModal" style="width: auto; padding: 15px 60px; font-size: 18px;">명단 제외 및 다음 게임</button>
+        <div class="winner-list" id="winnerNames"></div>
+        <button type="button" class="action-btn" id="btnCloseModal" style="width: auto; padding: 18px 60px; font-size: 20px;">당첨자 제외 확정</button>
     </div>
 
     <script>
@@ -148,14 +172,15 @@
         let finalWinners = [];
         let entities = [];
         let currentWinners = [];
+        let pegs = []; // 핀볼용 장애물
         
         let animationId;
         let gameActive = false;
-        let gameMode = 'racing'; // racing, pinball, wrestling
+        let gameMode = 'racing'; 
         
         let startTime = 0;
-        const TIME_LIMIT = 60000; // 60초 (1분)
-        const SUDDEN_DEATH_TIME = 50000; // 50초 이후 서든데스 발동
+        let totalGameTimeMs = 0;
+        let suddenDeathTimeMs = 0;
 
         function resizeCanvas() {
             canvas.width = canvas.parentElement.clientWidth;
@@ -164,17 +189,16 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 모드 선택 UI
         document.querySelectorAll('.mode-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 gameMode = this.getAttribute('data-mode');
+                document.body.className = `mode-${gameMode}`; // 배경색 변경
                 drawIdleScreen();
             });
         });
 
-        // 아바타 결정
         function getAvatar(weight) {
             if (weight >= 10) return '🚀';
             if (weight >= 6) return '🏎️';
@@ -183,19 +207,21 @@
             return '🐢';
         }
 
-        // 데이터 로드
+        // 정규식 개선: 띄어쓰기 없이 '이범준10' 도 완벽 인식
         document.getElementById('btnUpdateData').addEventListener('click', function() {
             const raw = document.getElementById('nameInput').value.trim();
             if (!raw) return;
             const lines = raw.split('\n');
             participants = [];
             lines.forEach((line, idx) => {
-                const match = line.trim().match(/^(.*?)(?:(?:\||\t|\s)+(\d+))?\s*$/);
+                // 숫자가 아닌 문자열(이름) + 뒤에 숫자(가중치) 추출
+                const match = line.trim().match(/^([^\d]+)(?:[\s\|]*(\d+))?\s*$/);
                 if (match && match[1]) {
+                    const name = match[1].trim();
                     const weight = match[2] ? parseInt(match[2], 10) : 1; 
                     participants.push({
                         id: 'p_' + idx + '_' + Date.now(),
-                        name: match[1].trim(),
+                        name: name,
                         weight: weight,
                         avatar: getAvatar(weight),
                         color: `hsl(${Math.random() * 360}, 80%, 60%)`
@@ -208,20 +234,32 @@
 
         function drawIdleScreen() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.font = '30px "Orbitron"';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.font = 'bold 36px "Orbitron"';
             ctx.textAlign = 'center';
             let modeName = gameMode === 'racing' ? 'GRAND PRIX' : gameMode === 'pinball' ? 'PLINKO DROP' : 'ROYAL RUMBLE';
-            ctx.fillText(`SYSTEM STANDBY : ${modeName} MODE`, canvas.width/2, canvas.height/2);
+            ctx.fillText(`SYSTEM STANDBY : ${modeName}`, canvas.width/2, canvas.height/2);
         }
         drawIdleScreen();
 
-        // 게임 시작
+        // 🚀 전체화면 트리거 함수
+        function goFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) { elem.requestFullscreen().catch(err => console.log(err)); }
+        }
+
         document.getElementById('btnStartGame').addEventListener('click', function() {
             const qty = parseInt(document.getElementById('prizeQty').value);
             const prize = document.getElementById('prizeTitle').value.trim();
             if (participants.length < qty) { alert("참가자가 부족합니다."); return; }
             if (!prize) { alert("상품명을 입력하세요."); return; }
+
+            goFullscreen(); // 시작 시 전체화면
+
+            // 게임 시간 동적 계산 (인원 * 0.4초, 최소 30초, 최대 120초)
+            const calcTime = Math.max(30, Math.min(120, participants.length * 0.4));
+            totalGameTimeMs = calcTime * 1000;
+            suddenDeathTimeMs = totalGameTimeMs - 10000; // 마지막 10초
 
             this.disabled = true;
             document.getElementById('resultModal').style.display = 'none';
@@ -236,67 +274,105 @@
             gameLoop(qty, prize);
         });
 
-        // 엔티티(참가자 물리 객체) 초기화
         function initEntities() {
+            // 핀볼용 페그(장애물) 생성
+            if (gameMode === 'pinball') {
+                pegs = [];
+                const cols = 15; const rows = 10;
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        let offset = (r % 2 === 0) ? 0 : (canvas.width / cols) / 2;
+                        pegs.push({
+                            x: (c * (canvas.width / cols)) + offset,
+                            y: (r * (canvas.height / rows)) + 50,
+                            radius: 8
+                        });
+                    }
+                }
+            }
+
             entities = participants.map((p, i) => {
-                let e = { ...p, status: 'normal', finished: false };
+                let e = { ...p, status: 'normal', finished: false, eliminated: false };
                 if (gameMode === 'racing') {
                     const trackH = canvas.height / participants.length;
                     e.x = 50; e.y = i * trackH + (trackH / 2); e.progress = 0;
-                    e.speed = (Math.random() * 0.02) + (p.weight * 0.005);
+                    e.speed = (Math.random() * 0.03) + (p.weight * 0.008);
+                    e.baseSpeed = e.speed;
                 } else if (gameMode === 'pinball') {
-                    e.x = (canvas.width / participants.length) * i + Math.random()*20;
-                    e.y = -50 - Math.random() * 200;
-                    e.vx = (Math.random() - 0.5) * 5; e.vy = 0; e.radius = 15;
+                    e.x = (canvas.width / participants.length) * i + Math.random()*10;
+                    e.y = -50 - Math.random() * 300;
+                    e.vx = (Math.random() - 0.5) * 2; e.vy = 0; 
+                    e.radius = Math.max(8, Math.min(15, 300 / participants.length));
                 } else if (gameMode === 'wrestling') {
-                    e.x = canvas.width / 2 + (Math.random() - 0.5) * 200;
-                    e.y = canvas.height / 2 + (Math.random() - 0.5) * 200;
-                    e.vx = (Math.random() - 0.5) * 10; e.vy = (Math.random() - 0.5) * 10;
-                    e.hp = 100 + (p.weight * 10); e.radius = 20;
+                    e.x = canvas.width / 2 + (Math.random() - 0.5) * 150;
+                    e.y = canvas.height / 2 + (Math.random() - 0.5) * 150;
+                    e.vx = (Math.random() - 0.5) * 5; e.vy = (Math.random() - 0.5) * 5;
+                    e.radius = Math.max(10, Math.min(25, 400 / participants.length));
+                    e.mass = e.weight; 
                 }
                 return e;
             });
         }
 
-        // 통합 게임 루프
         function gameLoop(targetWinCount, prize) {
             if (!gameActive) return;
             
             const elapsed = Date.now() - startTime;
-            const remaining = Math.max(0, 60 - Math.floor(elapsed / 1000));
+            const remaining = Math.max(0, Math.ceil((totalGameTimeMs - elapsed) / 1000));
             timerUI.innerText = `00:${remaining.toString().padStart(2, '0')}`;
             
-            // 서든데스 확인 (50초 이후)
-            const isSuddenDeath = elapsed > SUDDEN_DEATH_TIME;
+            const isSuddenDeath = elapsed >= suddenDeathTimeMs;
+            
             if (isSuddenDeath) {
                 timerUI.style.color = '#ff0055';
-                timerUI.classList.add('shake-active');
+                document.getElementById('gameContainer').classList.add('shake-active');
             } else {
                 timerUI.style.color = '#00f0ff';
-                timerUI.classList.remove('shake-active');
+                document.getElementById('gameContainer').classList.remove('shake-active');
+            }
+
+            // 타임오버 시 게임 강제 종료
+            if (elapsed >= totalGameTimeMs && gameMode !== 'wrestling') {
+                finalizeGame(targetWinCount, prize);
+                return;
             }
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (gameMode === 'racing') updateRacing(elapsed, isSuddenDeath, targetWinCount);
             else if (gameMode === 'pinball') updatePinball(elapsed, isSuddenDeath, targetWinCount);
-            else if (gameMode === 'wrestling') updateWrestling(elapsed, isSuddenDeath, targetWinCount);
+            else if (gameMode === 'wrestling') updateWrestling(elapsed, isSuddenDeath, targetWinCount, prize);
 
-            if (currentWinners.length >= targetWinCount) {
-                gameActive = false;
-                setTimeout(() => showResult(prize), 1000);
-            } else {
-                animationId = requestAnimationFrame(() => gameLoop(targetWinCount, prize));
+            if (gameActive) {
+                if (currentWinners.length >= targetWinCount && gameMode !== 'wrestling') {
+                    finalizeGame(targetWinCount, prize);
+                } else {
+                    animationId = requestAnimationFrame(() => gameLoop(targetWinCount, prize));
+                }
             }
         }
 
-        // 1. 레이싱 물리 엔진
+        function finalizeGame(targetWinCount, prize) {
+            gameActive = false;
+            document.getElementById('gameContainer').classList.remove('shake-active');
+            
+            // 승자가 부족하면 진척도(거리/높이) 기반으로 채움
+            if (currentWinners.length < targetWinCount) {
+                let sorted = [];
+                if (gameMode === 'racing') sorted = entities.filter(e => !e.finished).sort((a,b) => b.progress - a.progress);
+                if (gameMode === 'pinball') sorted = entities.filter(e => !e.finished).sort((a,b) => b.y - a.y);
+                
+                const needed = targetWinCount - currentWinners.length;
+                currentWinners.push(...sorted.slice(0, needed));
+            }
+
+            setTimeout(() => showResult(prize), 1000);
+        }
+
+        // 1. 레이싱
         function updateRacing(elapsed, isSuddenDeath, targetWinCount) {
             const finishLineX = canvas.width - 150;
-            
-            // 배경
-            ctx.fillStyle = 'rgba(0, 240, 255, 0.1)';
-            ctx.fillRect(finishLineX, 0, 5, canvas.height);
+            ctx.fillStyle = 'rgba(0, 240, 255, 0.2)'; ctx.fillRect(finishLineX, 0, 10, canvas.height);
 
             let maxProgress = Math.max(...entities.map(e => e.progress));
 
@@ -305,18 +381,19 @@
 
                 let currentSpeed = e.speed;
 
-                // 타임 게이트 로직: 50초 이전에는 아무도 90%를 넘지 못하도록 강제 억제 (서스펜스)
+                // 타임 게이트: 일반 시간엔 90%에서 정체
                 if (!isSuddenDeath && e.progress > 85) {
-                    currentSpeed *= 0.1; // 엄청 느려짐
+                    currentSpeed *= 0.05;
                 }
                 
-                // 서든데스 발동: 폭발적인 속도 증가 (가중치 영향 큼)
+                // 서든데스: 폭발적 랜덤 부스터
                 if (isSuddenDeath) {
-                    currentSpeed += (Math.random() * 0.5) + (e.weight * 0.1);
+                    if (Math.random() < 0.05) e.speed += (Math.random() * 0.8) + (e.weight * 0.1);
+                    currentSpeed = e.speed;
                 }
 
-                // 고무줄 효과: 뒤쳐진 사람 버프
-                if (e.progress < maxProgress - 30) currentSpeed *= 1.5;
+                // 고무줄 효과
+                if (e.progress < maxProgress - 20) currentSpeed *= 1.3;
 
                 e.progress += currentSpeed;
                 e.x = 50 + (e.progress / 100) * (finishLineX - 50);
@@ -329,35 +406,46 @@
             });
         }
 
-        // 2. 핀볼 (플링코) 물리 엔진
+        // 2. 핀볼
         function updatePinball(elapsed, isSuddenDeath, targetWinCount) {
+            // 장애물 그리기
+            ctx.fillStyle = isSuddenDeath ? '#ff0055' : '#00f0ff';
+            pegs.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2); ctx.fill(); });
+
             // 하단 당첨 슬롯
-            const slotHeight = 100;
-            ctx.fillStyle = 'rgba(250, 204, 21, 0.2)';
-            ctx.fillRect(0, canvas.height - slotHeight, canvas.width, slotHeight);
-            ctx.fillStyle = '#facc15'; ctx.font = '20px Orbitron'; ctx.textAlign = 'center';
-            ctx.fillText("WINNER ZONE", canvas.width/2, canvas.height - 40);
+            const slotHeight = 80;
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.3)'; ctx.fillRect(0, canvas.height - slotHeight, canvas.width, slotHeight);
+            ctx.fillStyle = '#facc15'; ctx.font = '24px Orbitron'; ctx.textAlign = 'center';
+            ctx.fillText("WINNER ZONE", canvas.width/2, canvas.height - 30);
 
             entities.forEach(e => {
                 if (e.finished) { renderEntity(e, 'pinball'); return; }
 
-                e.vy += 0.2; // 중력
+                // 서든데스 시 미친 중력
+                e.vy += isSuddenDeath ? 0.8 : 0.15; 
                 e.x += e.vx; e.y += e.vy;
 
-                // 벽 튕기기
-                if (e.x < e.radius || e.x > canvas.width - e.radius) { e.vx *= -1; e.x = Math.max(e.radius, Math.min(e.x, canvas.width - e.radius)); }
+                // 벽 충돌
+                if (e.x < e.radius || e.x > canvas.width - e.radius) { e.vx *= -0.8; e.x = Math.max(e.radius, Math.min(e.x, canvas.width - e.radius)); }
 
-                // 타임 게이트: 50초 이전에는 하단에 닿으면 강제로 위로 튕겨올림 (점프 패드)
+                // 페그(장애물) 충돌
+                if (!isSuddenDeath) { // 서든데스엔 장애물 무시하고 수직 낙하
+                    pegs.forEach(p => {
+                        const dx = e.x - p.x; const dy = e.y - p.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < e.radius + p.radius) {
+                            const angle = Math.atan2(dy, dx);
+                            e.vx += Math.cos(angle) * 3; e.vy = Math.sin(angle) * 3;
+                        }
+                    });
+                }
+
+                // 타임 게이트: 시간 안 됐으면 바닥 닿기 전 강제 점프
                 if (!isSuddenDeath && e.y > canvas.height - slotHeight - 50) {
-                    e.vy = -10 - Math.random() * 10; // 높이 튕김
-                    e.vx = (Math.random() - 0.5) * 20;
+                    e.vy = -12 - Math.random() * 8; e.vx = (Math.random() - 0.5) * 15;
                 }
 
-                // 서든 데스: 무거운 중력 적용, 당첨 존 입성 허용
-                if (isSuddenDeath) {
-                    e.vy += 0.5;
-                }
-
+                // 당첨
                 if (e.y > canvas.height - 20) {
                     e.y = canvas.height - 20; e.vy = 0; e.vx = 0; e.finished = true;
                     if (currentWinners.length < targetWinCount) currentWinners.push(e);
@@ -366,91 +454,100 @@
             });
         }
 
-        // 3. 로얄 럼블 (레슬링) 물리 엔진
-        function updateWrestling(elapsed, isSuddenDeath, targetWinCount) {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+        // 3. 로얄 럼블 (배틀그라운드 룰: 최후의 생존자가 우승)
+        function updateWrestling(elapsed, isSuddenDeath, targetWinCount, prize) {
+            const cx = canvas.width / 2; const cy = canvas.height / 2;
             
-            // 링 크기 (시간이 지날수록 줄어드는 자기장)
-            let ringRadius = isSuddenDeath ? Math.max(50, 300 - (elapsed - SUDDEN_DEATH_TIME)/20) : 300;
+            // 링 크기 조절
+            let ringRadius = 350;
+            if (elapsed > totalGameTimeMs * 0.3) {
+                const shrinkRatio = (elapsed - totalGameTimeMs*0.3) / (totalGameTimeMs*0.7);
+                ringRadius = Math.max(0, 350 - (350 * shrinkRatio)); // 서든데스 땐 0으로 수렴
+            }
             
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = isSuddenDeath ? '#ff0055' : '#00f0ff';
-            ctx.lineWidth = 5; ctx.stroke();
-            if(isSuddenDeath) { ctx.fillStyle='rgba(255,0,85,0.1)'; ctx.fill(); }
+            ctx.beginPath(); ctx.arc(cx, cy, ringRadius, 0, Math.PI*2);
+            ctx.strokeStyle = isSuddenDeath ? '#ff0055' : '#00f0ff'; ctx.lineWidth = 5; ctx.stroke();
+            ctx.fillStyle = isSuddenDeath ? 'rgba(255,0,85,0.1)' : 'rgba(0,240,255,0.05)'; ctx.fill();
 
-            let aliveEntities = entities.filter(e => !e.finished);
+            let alive = entities.filter(e => !e.eliminated);
 
-            aliveEntities.forEach(e => {
+            alive.forEach(e => {
                 e.x += e.vx; e.y += e.vy;
-                
-                // 마찰력
-                e.vx *= 0.98; e.vy *= 0.98;
+                e.vx *= 0.95; e.vy *= 0.95;
 
-                // 중앙으로 모이는 미세한 인력 (난전 유도)
-                e.vx += (centerX - e.x) * 0.001; e.vy += (centerY - e.y) * 0.001;
-
-                // 벽(링) 충돌 처리
-                const distFromCenter = Math.hypot(e.x - centerX, e.y - centerY);
-                if (distFromCenter > ringRadius - e.radius) {
-                    // 서든 데스 시 링 밖으로 나가면 아웃 (당첨) - 역발상: 튕겨져 나가는게 승리
-                    if (isSuddenDeath) {
-                        e.finished = true;
-                        if (currentWinners.length < targetWinCount) currentWinners.push(e);
-                    } else {
-                        // 일반 시간엔 튕겨서 돌아옴
-                        const angle = Math.atan2(e.y - centerY, e.x - centerX);
-                        e.vx = -Math.cos(angle) * 10; e.vy = -Math.sin(angle) * 10;
+                // 링 밖으로 나가면 탈락 (Eliminated)
+                const distFromCenter = Math.hypot(e.x - cx, e.y - cy);
+                if (distFromCenter > ringRadius) {
+                    e.eliminated = true;
+                    // 남은 인원이 딱 뽑아야 할 인원이면 게임 종료 트리거
+                    if (entities.filter(en => !en.eliminated).length === targetWinCount) {
+                        currentWinners = entities.filter(en => !en.eliminated);
+                        finalizeGame(targetWinCount, prize);
                     }
+                } else {
+                    // 중앙 인력
+                    e.vx += (cx - e.x) * 0.002; e.vy += (cy - e.y) * 0.002;
                 }
 
-                // 엔티티 간 충돌 (튕겨내기)
-                aliveEntities.forEach(other => {
+                // 충돌 처리
+                alive.forEach(other => {
                     if (e !== other) {
                         const dx = other.x - e.x; const dy = other.y - e.y;
                         const dist = Math.hypot(dx, dy);
                         if (dist < e.radius + other.radius) {
                             const angle = Math.atan2(dy, dx);
-                            const power = (e.weight / 10) + Math.random() * 5; // 가중치 높을수록 튕겨내는 힘 강함
-                            other.vx += Math.cos(angle) * power;
-                            other.vy += Math.sin(angle) * power;
+                            const force = (e.weight * 0.5) + Math.random() * 2;
+                            other.vx += Math.cos(angle) * force; other.vy += Math.sin(angle) * force;
                         }
                     }
                 });
-
                 renderEntity(e, 'wrestling');
             });
             
-            // 만약 생존자가 뽑을 인원과 같아지면 그 생존자들이 승리하는 로직도 가능하나,
-            // 빠른 결론을 위해 '링 밖으로 튕겨 나간 자'를 우승자로 판정 (배틀그라운드 자기장 밖 탈출 컨셉)
-        }
-
-        // 공통 렌더링 함수
-        function renderEntity(e, mode) {
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            if (mode === 'racing') {
-                const fontSize = Math.max(16, canvas.height / participants.length * 0.8);
-                ctx.font = `${fontSize}px Arial`; ctx.fillText(e.avatar, e.x, e.y);
-                ctx.font = `bold ${fontSize*0.6}px "Noto Sans KR"`;
-                ctx.fillStyle = e.finished ? '#facc15' : '#fff';
-                ctx.textAlign = 'left'; ctx.fillText(e.name, e.x + 15, e.y);
-            } else {
-                // Pinball & Wrestling
-                ctx.beginPath(); ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
-                ctx.fillStyle = e.color; ctx.fill();
-                ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
-                
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 12px "Noto Sans KR"';
-                ctx.fillText(e.name.substring(0,2), e.x, e.y); // 원 안에 이름 2글자
+            // 타임오버 시 중앙에 가장 가까운 생존자들이 우승
+            if (elapsed >= totalGameTimeMs && gameActive) {
+                alive.sort((a,b) => Math.hypot(a.x-cx, a.y-cy) - Math.hypot(b.x-cx, b.y-cy));
+                currentWinners = alive.slice(0, targetWinCount);
+                finalizeGame(targetWinCount, prize);
             }
         }
 
-        // 게임 종료 처리
+        // 공통 렌더링
+        function renderEntity(e, mode) {
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            if (mode === 'racing') {
+                const fontSize = Math.max(16, canvas.height / participants.length * 0.7);
+                ctx.font = `${fontSize}px Arial`; ctx.fillText(e.avatar, e.x, e.y);
+                ctx.font = `bold ${fontSize*0.7}px "Noto Sans KR"`;
+                ctx.fillStyle = e.finished ? '#facc15' : '#fff';
+                ctx.textAlign = 'left'; 
+                ctx.fillText(e.name, e.x + fontSize, e.y); // 이름 길이 관계없이 전부 그림
+            } else {
+                ctx.beginPath(); ctx.arc(e.x, e.y, e.radius, 0, Math.PI*2);
+                ctx.fillStyle = e.color; ctx.fill();
+                ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+                
+                // 폰트 크기 동적 조절로 네 글자 이름도 원 안에 욱여넣음
+                const fontSize = Math.max(8, e.radius * 0.7);
+                ctx.fillStyle = '#fff'; ctx.font = `bold ${fontSize}px "Noto Sans KR"`;
+                ctx.fillText(e.name, e.x, e.y); 
+            }
+        }
+
+        // 결과 모달창
         function showResult(prize) {
             timerUI.style.display = 'none';
             document.getElementById('modalPrizeTitle').innerText = `[ ${prize} ]`;
-            document.getElementById('winnerNames').innerHTML = currentWinners.map((w, i) => `<div><span style="color:#facc15; font-size:0.6em;">${i+1}위</span> ${w.name}</div>`).join('');
+            
+            // 등수 매칭하여 UI 표시
+            const listHtml = currentWinners.map((w, idx) => `
+                <div class="winner-card">
+                    <div class="rank-badge">${idx + 1}등</div>
+                    <div class="winner-name">${w.name}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('winnerNames').innerHTML = listHtml;
             document.getElementById('resultModal').style.display = 'flex';
             document.getElementById('btnStartGame').disabled = false;
         }
@@ -464,9 +561,11 @@
             document.getElementById('resultModal').style.display = 'none';
             document.getElementById('prizeTitle').value = ""; 
             drawIdleScreen();
+            
+            // 전체화면 해제 (옵션)
+            // if (document.exitFullscreen) document.exitFullscreen();
         });
 
-        // 엑셀 저장
         document.getElementById('btnExportCSV').addEventListener('click', function() {
             if (finalWinners.length === 0) { alert("저장할 데이터가 없습니다."); return; }
             let csv = "\uFEFF상품명,당첨자이름\n";
@@ -474,7 +573,7 @@
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = 'e스포츠_최종결과.csv'; a.click();
+            a.href = url; a.download = '익스트림_추첨결과.csv'; a.click();
         });
     </script>
 </body>
