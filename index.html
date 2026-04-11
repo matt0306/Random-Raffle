@@ -4,131 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:,">
-    <title>MX e-Sports Raffle System</title>
+    <title>MX e-Sports Raffle System v8</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Noto+Sans+KR:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800;900&family=Noto+Sans+KR:wght@400;700;900&display=swap');
         
         :root {
-            --bg-color: #050505;
-            --panel-bg: rgba(20, 25, 40, 0.75);
-            --accent-main: #00f0ff;
-            --accent-sec: #ff0055;
-            --accent-thr: #facc15;
-            --text-main: #ffffff;
-            --text-muted: #8b9bb4;
+            --bg-color: #050505; --panel-bg: rgba(15, 20, 30, 0.85);
+            --accent-main: #00f0ff; --accent-sec: #ff0055; --accent-thr: #facc15;
         }
 
         body {
             margin: 0; padding: 20px; font-family: 'Noto Sans KR', sans-serif;
-            background: var(--bg-color); color: var(--text-main);
+            background: var(--bg-color); color: #fff;
             display: flex; height: 100vh; gap: 20px; box-sizing: border-box; overflow: hidden;
-            transition: background 0.5s ease;
+            transition: background 0.5s ease, padding 0.5s ease;
         }
 
-        /* 게임 모드별 배경 설정 */
-        body.mode-racing { background: radial-gradient(circle at 50% 0%, #10182b 0%, #050505 80%); }
-        body.mode-pinball { background: radial-gradient(circle at 50% 0%, #2b1022 0%, #050505 80%); }
-        body.mode-wrestling { background: radial-gradient(circle at 50% 50%, #2b1010 0%, #050505 80%); }
+        body.game-active { padding: 0; gap: 0; }
+        body.mode-racing { background: radial-gradient(circle at 50% 0%, #0d1b2a 0%, #000000 100%); }
+        body.mode-pinball { background: radial-gradient(circle at 50% 0%, #240046 0%, #000000 100%); }
+        body.mode-wrestling { background: radial-gradient(circle at 50% 50%, #370617 0%, #000000 100%); }
 
         .sidebar {
-            width: 350px; background: var(--panel-bg); padding: 25px;
-            border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            z-index: 10; flex-shrink: 0;
+            width: 360px; background: var(--panel-bg); padding: 25px;
+            border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.3);
+            backdrop-filter: blur(20px); display: flex; flex-direction: column; gap: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9); z-index: 10; flex-shrink: 0;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease, width 0.5s;
         }
+        
+        /* 시네마틱 모드 시 사이드바 숨김 */
+        .sidebar.hidden { transform: translateX(-150%); width: 0; opacity: 0; padding: 0; border: 0; overflow: hidden; }
 
         .main {
             flex: 1; border-radius: 16px; position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.9); overflow: hidden;
+            background: rgba(0, 0, 0, 0.6); box-shadow: inset 0 0 100px rgba(0,0,0,1);
+            overflow: hidden; transition: border-radius 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
+        body.game-active .main { border-radius: 0; border: none; }
 
         h2.brand {
-            font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 800;
-            color: var(--text-main); text-align: center; margin: 0;
-            text-shadow: 0 0 10px var(--accent-main), 0 0 20px var(--accent-main);
-            letter-spacing: 3px;
+            font-family: 'Orbitron', sans-serif; font-size: 34px; font-weight: 900;
+            text-align: center; margin: 0; text-shadow: 0 0 15px var(--accent-main);
+            letter-spacing: 2px; color: #fff;
         }
 
-        label { font-size: 13px; color: var(--accent-main); font-weight: bold; text-transform: uppercase; }
+        label { font-size: 13px; color: var(--accent-main); font-weight: 700; }
         
         textarea, input {
-            width: 100%; background: rgba(0,0,0,0.6); color: white;
+            width: 100%; background: rgba(0,0,0,0.5); color: white;
             border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;
-            box-sizing: border-box; outline: none; font-family: inherit; font-size: 15px;
-            transition: all 0.3s ease;
+            box-sizing: border-box; outline: none; font-size: 15px;
         }
-        textarea:focus, input:focus { border-color: var(--accent-main); box-shadow: 0 0 10px rgba(0,240,255,0.3); }
+        textarea:focus, input:focus { border-color: var(--accent-main); box-shadow: 0 0 10px rgba(0,240,255,0.4); }
 
-        .mode-selector { display: flex; gap: 10px; margin-bottom: 5px; }
+        .mode-selector { display: flex; gap: 8px; margin-bottom: 5px; }
         .mode-btn {
             flex: 1; padding: 12px 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
-            color: var(--text-muted); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold;
-            transition: 0.3s;
+            color: #8b9bb4; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.2s;
         }
-        .mode-btn.active { background: rgba(0, 240, 255, 0.2); border-color: var(--accent-main); color: var(--text-main); text-shadow: 0 0 5px var(--accent-main); }
+        .mode-btn.active { background: rgba(0, 240, 255, 0.2); border-color: var(--accent-main); color: #fff; text-shadow: 0 0 5px var(--accent-main); }
 
         button.action-btn {
-            width: 100%; padding: 18px; cursor: pointer; border-radius: 8px; font-weight: 800;
-            background: linear-gradient(45deg, transparent, rgba(0, 240, 255, 0.15));
+            width: 100%; padding: 18px; cursor: pointer; border-radius: 8px; font-weight: 900;
+            background: linear-gradient(90deg, rgba(0,240,255,0.1), rgba(0,240,255,0.3));
             color: var(--accent-main); border: 1px solid var(--accent-main);
-            transition: all 0.3s; font-size: 18px; letter-spacing: 2px;
-            font-family: 'Orbitron', 'Noto Sans KR', sans-serif;
+            font-size: 18px; letter-spacing: 2px; font-family: 'Orbitron', sans-serif; transition: 0.3s;
         }
-        button.action-btn:hover:not(:disabled) { background: var(--accent-main); color: #000; box-shadow: 0 0 25px var(--accent-main); }
-        button.action-btn:disabled { border-color: #333; color: #555; cursor: not-allowed; background: transparent; }
-        
-        button.export-btn { border-color: #48bb78; color: #48bb78; padding: 12px; font-size: 14px; }
-        button.export-btn:hover { background: #48bb78; box-shadow: 0 0 20px #48bb78; }
+        button.action-btn:hover { background: var(--accent-main); color: #000; box-shadow: 0 0 30px var(--accent-main); transform: scale(1.02); }
+        button.action-btn:disabled { opacity: 0.5; pointer-events: none; }
 
-        #poolDisplay { font-size: 22px; color: var(--text-main); text-align: center; font-weight: bold; padding: 12px; background: rgba(0,0,0,0.4); border-radius: 8px; }
+        #poolDisplay { font-size: 24px; text-align: center; font-weight: 900; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 8px; }
 
         #gameTimer {
-            position: absolute; top: 25px; right: 30px; font-family: 'Orbitron', sans-serif;
-            font-size: 45px; color: var(--accent-main); font-weight: 800; z-index: 5;
-            text-shadow: 0 0 15px var(--accent-main); display: none;
+            position: absolute; top: 30px; right: 40px; font-family: 'Orbitron', sans-serif;
+            font-size: 60px; color: #fff; font-weight: 900; z-index: 5;
+            text-shadow: 0 0 20px var(--accent-main), 0 0 40px var(--accent-main); display: none;
         }
+        .time-warning { color: var(--accent-sec) !important; text-shadow: 0 0 20px var(--accent-sec), 0 0 40px var(--accent-sec) !important; animation: pulse 0.5s infinite; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         canvas { display: block; width: 100%; height: 100%; }
 
         .modal {
-            position: absolute; inset: 0; background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(15px);
+            position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(20px);
             display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
         }
-        .modal h1 { font-family: 'Orbitron', sans-serif; color: var(--accent-thr); font-size: 6em; margin: 0 0 10px 0; text-shadow: 0 0 50px var(--accent-thr); }
-        .modal h2 { color: var(--text-main); font-size: 2.5em; margin-bottom: 40px; text-shadow: 0 0 10px #fff; }
+        .modal h1 { font-family: 'Orbitron', sans-serif; color: var(--accent-thr); font-size: 7em; margin: 0 0 10px 0; text-shadow: 0 0 60px rgba(250, 204, 21, 0.8); }
         
-        .winner-list {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
-            width: 80%; max-height: 50vh; overflow-y: auto; margin-bottom: 40px; padding: 10px;
+        .winner-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
+            width: 90%; max-width: 1200px; max-height: 50vh; overflow-y: auto; margin: 30px 0; padding: 20px;
         }
         .winner-card {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--accent-thr);
-            border-radius: 10px; padding: 15px; text-align: center;
-            box-shadow: 0 0 15px rgba(250, 204, 21, 0.2);
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            border: 1px solid var(--accent-thr); border-radius: 12px; padding: 20px; text-align: center;
+            box-shadow: 0 10px 30px rgba(250, 204, 21, 0.15); backdrop-filter: blur(5px);
         }
-        .rank-badge { font-family: 'Orbitron', sans-serif; color: var(--accent-thr); font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
-        .winner-name { font-size: 1.8em; font-weight: bold; color: white; }
-
-        /* 화면 흔들림 효과 */
-        @keyframes shake {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(-3px, 3px); }
-            50% { transform: translate(3px, -3px); }
-            75% { transform: translate(-3px, -3px); }
-        }
-        .shake-active { animation: shake 0.2s infinite; }
+        .rank-badge { font-family: 'Orbitron', sans-serif; color: var(--accent-thr); font-size: 1.5em; font-weight: 900; margin-bottom: 10px; }
+        .winner-name { font-size: 2em; font-weight: 900; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="mode-racing">
-    <div class="sidebar">
+    <div class="sidebar" id="controlPanel">
         <h2 class="brand">MX ESPORTS</h2>
-        
-        <label>1. 참가자 등록 (이름과 가중치)</label>
-        <textarea id="nameInput" rows="8" placeholder="이범준10&#10;홍길동 3&#10;권나라"></textarea>
-        <button type="button" class="action-btn" id="btnUpdateData" style="padding: 14px; font-size: 15px;">데이터 파싱</button>
+        <label>1. 참가자 명단 (이름 점수)</label>
+        <textarea id="nameInput" rows="7" placeholder="이범준10&#10;홍길동 3&#10;권나라"></textarea>
+        <button type="button" class="action-btn" id="btnUpdateData" style="padding: 15px; font-size: 16px;">데이터 파싱</button>
         <div id="poolDisplay">0 명 대기중</div>
         
         <hr style="width:100%; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
@@ -136,19 +120,19 @@
         <label>2. 게임 모드</label>
         <div class="mode-selector">
             <button class="mode-btn active" data-mode="racing">🏎️ 그랑프리</button>
-            <button class="mode-btn" data-mode="pinball">🎯 핀볼드롭</button>
+            <button class="mode-btn" data-mode="pinball">🎯 마블드롭</button>
             <button class="mode-btn" data-mode="wrestling">🤼 로얄럼블</button>
         </div>
 
         <label>3. 라운드 세팅</label>
-        <input type="text" id="prizeTitle" placeholder="상품명 (예: 아이패드)">
+        <input type="text" id="prizeTitle" placeholder="상품명 입력">
         <div style="display: flex; gap: 10px; align-items: center;">
             <input type="number" id="prizeQty" value="1" min="1">
-            <span style="font-size: 15px; color: var(--text-muted); font-weight: bold;">명 추출</span>
+            <span style="font-size: 15px; font-weight: bold;">명 추출</span>
         </div>
         
         <button type="button" class="action-btn" id="btnStartGame" style="margin-top: 15px;">🚀 START GAME</button>
-        <button type="button" class="action-btn export-btn" id="btnExportCSV" style="margin-top: auto;">결과 엑셀 저장</button>
+        <button type="button" class="action-btn" id="btnExportCSV" style="margin-top: auto; background: rgba(72,187,120,0.1); border-color: #48bb78; color: #48bb78; font-size: 14px;">결과 엑셀 다운로드</button>
     </div>
 
     <div class="main" id="gameContainer">
@@ -157,30 +141,27 @@
     </div>
 
     <div class="modal" id="resultModal">
-        <h1>WINNER</h1>
-        <h2 id="modalPrizeTitle"></h2>
-        <div class="winner-list" id="winnerNames"></div>
-        <button type="button" class="action-btn" id="btnCloseModal" style="width: auto; padding: 18px 60px; font-size: 20px;">당첨자 제외 확정</button>
+        <h1>WINNERS</h1>
+        <h2 id="modalPrizeTitle" style="font-size: 2.5em; margin:0;"></h2>
+        <div class="winner-grid" id="winnerNames"></div>
+        <button type="button" class="action-btn" id="btnCloseModal" style="width: auto; padding: 20px 80px; font-size: 24px;">당첨자 확정 및 로비 복귀</button>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const timerUI = document.getElementById('gameTimer');
+        const sidebar = document.getElementById('controlPanel');
         
-        let participants = [];
-        let finalWinners = [];
-        let entities = [];
-        let currentWinners = [];
-        let pegs = []; // 핀볼용 장애물
+        let participants = [], finalWinners = [], entities = [], currentWinners = [], pegs = [];
+        let animationId, gameActive = false, gameMode = 'racing';
         
-        let animationId;
-        let gameActive = false;
-        let gameMode = 'racing'; 
+        let startTime = 0, totalGameTimeMs = 0, suddenDeathTimeMs = 0;
         
-        let startTime = 0;
-        let totalGameTimeMs = 0;
-        let suddenDeathTimeMs = 0;
+        // 카메라 시스템
+        let camera = { x: 0, y: 0, targetX: 0, targetY: 0, scale: 1, targetScale: 1 };
+        // 맵 크기 세팅
+        let worldWidth = 0, worldHeight = 0;
 
         function resizeCanvas() {
             canvas.width = canvas.parentElement.clientWidth;
@@ -194,58 +175,36 @@
                 document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 gameMode = this.getAttribute('data-mode');
-                document.body.className = `mode-${gameMode}`; // 배경색 변경
-                drawIdleScreen();
+                document.body.className = `mode-${gameMode}`;
             });
         });
 
         function getAvatar(weight) {
-            if (weight >= 10) return '🚀';
-            if (weight >= 6) return '🏎️';
-            if (weight >= 4) return '🚗';
-            if (weight >= 2) return '🏃';
-            return '🐢';
+            if (weight >= 10) return '🚀'; if (weight >= 6) return '🏎️';
+            if (weight >= 4) return '🚗'; if (weight >= 2) return '🏃'; return '🐢';
         }
 
-        // 정규식 개선: 띄어쓰기 없이 '이범준10' 도 완벽 인식
         document.getElementById('btnUpdateData').addEventListener('click', function() {
-            const raw = document.getElementById('nameInput').value.trim();
-            if (!raw) return;
-            const lines = raw.split('\n');
+            const lines = document.getElementById('nameInput').value.trim().split('\n');
             participants = [];
             lines.forEach((line, idx) => {
-                // 숫자가 아닌 문자열(이름) + 뒤에 숫자(가중치) 추출
                 const match = line.trim().match(/^([^\d]+)(?:[\s\|]*(\d+))?\s*$/);
                 if (match && match[1]) {
-                    const name = match[1].trim();
                     const weight = match[2] ? parseInt(match[2], 10) : 1; 
                     participants.push({
-                        id: 'p_' + idx + '_' + Date.now(),
-                        name: name,
-                        weight: weight,
-                        avatar: getAvatar(weight),
-                        color: `hsl(${Math.random() * 360}, 80%, 60%)`
+                        id: 'p_' + idx, name: match[1].trim(), weight: weight,
+                        avatar: getAvatar(weight), color: `hsl(${Math.random() * 360}, 80%, 60%)`
                     });
                 }
             });
             document.getElementById('poolDisplay').innerText = `${participants.length} 명 대기중`;
-            drawIdleScreen();
         });
 
-        function drawIdleScreen() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.font = 'bold 36px "Orbitron"';
-            ctx.textAlign = 'center';
-            let modeName = gameMode === 'racing' ? 'GRAND PRIX' : gameMode === 'pinball' ? 'PLINKO DROP' : 'ROYAL RUMBLE';
-            ctx.fillText(`SYSTEM STANDBY : ${modeName}`, canvas.width/2, canvas.height/2);
-        }
-        drawIdleScreen();
-
-        // 🚀 전체화면 트리거 함수
         function goFullscreen() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) { elem.requestFullscreen().catch(err => console.log(err)); }
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+        }
+        function exitFullscreen() {
+            if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
         }
 
         document.getElementById('btnStartGame').addEventListener('click', function() {
@@ -254,19 +213,20 @@
             if (participants.length < qty) { alert("참가자가 부족합니다."); return; }
             if (!prize) { alert("상품명을 입력하세요."); return; }
 
-            goFullscreen(); // 시작 시 전체화면
+            // UI 시네마틱 전환
+            goFullscreen();
+            sidebar.classList.add('hidden');
+            document.body.classList.add('game-active');
+            setTimeout(resizeCanvas, 500); // 패널 숨김 애니메이션 후 캔버스 리사이즈
 
-            // 게임 시간 동적 계산 (인원 * 0.4초, 최소 30초, 최대 120초)
-            const calcTime = Math.max(30, Math.min(120, participants.length * 0.4));
-            totalGameTimeMs = calcTime * 1000;
-            suddenDeathTimeMs = totalGameTimeMs - 10000; // 마지막 10초
+            // 시간 동기화 (최소 30초, 최대 120초)
+            totalGameTimeMs = Math.max(30000, Math.min(120000, participants.length * 300));
+            suddenDeathTimeMs = totalGameTimeMs - 10000;
 
-            this.disabled = true;
-            document.getElementById('resultModal').style.display = 'none';
             timerUI.style.display = 'block';
             currentWinners = [];
             
-            initEntities();
+            initWorldAndEntities();
             startTime = Date.now();
             gameActive = true;
             
@@ -274,199 +234,206 @@
             gameLoop(qty, prize);
         });
 
-        function initEntities() {
-            // 핀볼용 페그(장애물) 생성
-            if (gameMode === 'pinball') {
+        function initWorldAndEntities() {
+            camera = { x: 0, y: 0, targetX: 0, targetY: 0, scale: 1, targetScale: 1 };
+            
+            if (gameMode === 'racing') {
+                worldWidth = canvas.width * 5; // 화면 5배 길이의 트랙
+                worldHeight = canvas.height;
+                const trackH = worldHeight / participants.length;
+                
+                entities = participants.map((p, i) => ({
+                    ...p, x: 50, y: i * trackH + (trackH / 2),
+                    progress: 0, status: 'normal', boostMult: 1
+                }));
+            } 
+            else if (gameMode === 'pinball') {
+                worldWidth = canvas.width;
+                worldHeight = canvas.height * 5; // 화면 5배 높이의 핀볼 맵
+                
                 pegs = [];
-                const cols = 15; const rows = 10;
-                for (let r = 0; r < rows; r++) {
-                    for (let c = 0; c < cols; c++) {
-                        let offset = (r % 2 === 0) ? 0 : (canvas.width / cols) / 2;
-                        pegs.push({
-                            x: (c * (canvas.width / cols)) + offset,
-                            y: (r * (canvas.height / rows)) + 50,
-                            radius: 8
-                        });
+                for (let y = 200; y < worldHeight - 300; y += 80) {
+                    for (let x = 0; x < worldWidth; x += 100) {
+                        pegs.push({ x: x + (Math.random()*40), y: y + (Math.random()*40), radius: 10 });
                     }
                 }
+                
+                entities = participants.map((p, i) => ({
+                    ...p, x: (worldWidth / participants.length) * i, y: -Math.random()*500,
+                    vx: (Math.random()-0.5)*5, vy: 0, radius: Math.max(12, Math.min(25, 500/participants.length))
+                }));
             }
-
-            entities = participants.map((p, i) => {
-                let e = { ...p, status: 'normal', finished: false, eliminated: false };
-                if (gameMode === 'racing') {
-                    const trackH = canvas.height / participants.length;
-                    e.x = 50; e.y = i * trackH + (trackH / 2); e.progress = 0;
-                    e.speed = (Math.random() * 0.03) + (p.weight * 0.008);
-                    e.baseSpeed = e.speed;
-                } else if (gameMode === 'pinball') {
-                    e.x = (canvas.width / participants.length) * i + Math.random()*10;
-                    e.y = -50 - Math.random() * 300;
-                    e.vx = (Math.random() - 0.5) * 2; e.vy = 0; 
-                    e.radius = Math.max(8, Math.min(15, 300 / participants.length));
-                } else if (gameMode === 'wrestling') {
-                    e.x = canvas.width / 2 + (Math.random() - 0.5) * 150;
-                    e.y = canvas.height / 2 + (Math.random() - 0.5) * 150;
-                    e.vx = (Math.random() - 0.5) * 5; e.vy = (Math.random() - 0.5) * 5;
-                    e.radius = Math.max(10, Math.min(25, 400 / participants.length));
-                    e.mass = e.weight; 
-                }
-                return e;
-            });
+            else if (gameMode === 'wrestling') {
+                worldWidth = canvas.width; worldHeight = canvas.height;
+                entities = participants.map(p => ({
+                    ...p, x: worldWidth/2 + (Math.random()-0.5)*200, y: worldHeight/2 + (Math.random()-0.5)*200,
+                    vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+                    radius: Math.max(15, Math.min(30, 400/participants.length)), eliminated: false
+                }));
+            }
         }
 
         function gameLoop(targetWinCount, prize) {
             if (!gameActive) return;
-            
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(0, Math.ceil((totalGameTimeMs - elapsed) / 1000));
-            timerUI.innerText = `00:${remaining.toString().padStart(2, '0')}`;
             
+            timerUI.innerText = `00:${remaining.toString().padStart(2, '0')}`;
             const isSuddenDeath = elapsed >= suddenDeathTimeMs;
             
-            if (isSuddenDeath) {
-                timerUI.style.color = '#ff0055';
-                document.getElementById('gameContainer').classList.add('shake-active');
-            } else {
-                timerUI.style.color = '#00f0ff';
-                document.getElementById('gameContainer').classList.remove('shake-active');
+            if (isSuddenDeath) timerUI.classList.add('time-warning');
+            else timerUI.classList.remove('time-warning');
+
+            // 타임오버 처리
+            if (elapsed >= totalGameTimeMs && gameMode !== 'wrestling') {
+                finalizeGame(targetWinCount, prize); return;
             }
 
-            // 타임오버 시 게임 강제 종료
-            if (elapsed >= totalGameTimeMs && gameMode !== 'wrestling') {
-                finalizeGame(targetWinCount, prize);
-                return;
-            }
+            // 카메라 부드러운 이동 (Lerp)
+            camera.x += (camera.targetX - camera.x) * 0.05;
+            camera.y += (camera.targetY - camera.y) * 0.05;
+            camera.scale += (camera.targetScale - camera.scale) * 0.05;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            // 화면 중심 기준 줌인 및 이동
+            ctx.translate(canvas.width/2, canvas.height/2);
+            ctx.scale(camera.scale, camera.scale);
+            ctx.translate(-canvas.width/2 - camera.x, -canvas.height/2 - camera.y);
 
             if (gameMode === 'racing') updateRacing(elapsed, isSuddenDeath, targetWinCount);
             else if (gameMode === 'pinball') updatePinball(elapsed, isSuddenDeath, targetWinCount);
             else if (gameMode === 'wrestling') updateWrestling(elapsed, isSuddenDeath, targetWinCount, prize);
 
+            ctx.restore(); // 카메라 변환 복구
+
             if (gameActive) {
-                if (currentWinners.length >= targetWinCount && gameMode !== 'wrestling') {
-                    finalizeGame(targetWinCount, prize);
-                } else {
-                    animationId = requestAnimationFrame(() => gameLoop(targetWinCount, prize));
-                }
+                if (currentWinners.length >= targetWinCount && gameMode !== 'wrestling') finalizeGame(targetWinCount, prize);
+                else animationId = requestAnimationFrame(() => gameLoop(targetWinCount, prize));
             }
         }
 
         function finalizeGame(targetWinCount, prize) {
             gameActive = false;
-            document.getElementById('gameContainer').classList.remove('shake-active');
-            
-            // 승자가 부족하면 진척도(거리/높이) 기반으로 채움
+            // 승자 부족 시 진척도로 채움
             if (currentWinners.length < targetWinCount) {
                 let sorted = [];
-                if (gameMode === 'racing') sorted = entities.filter(e => !e.finished).sort((a,b) => b.progress - a.progress);
+                if (gameMode === 'racing') sorted = entities.filter(e => !e.finished).sort((a,b) => b.x - a.x);
                 if (gameMode === 'pinball') sorted = entities.filter(e => !e.finished).sort((a,b) => b.y - a.y);
-                
-                const needed = targetWinCount - currentWinners.length;
-                currentWinners.push(...sorted.slice(0, needed));
+                currentWinners.push(...sorted.slice(0, targetWinCount - currentWinners.length));
             }
-
             setTimeout(() => showResult(prize), 1000);
         }
 
-        // 1. 레이싱
+        // --- 1. 레이싱 엔진 (Time-Sync) ---
         function updateRacing(elapsed, isSuddenDeath, targetWinCount) {
-            const finishLineX = canvas.width - 150;
-            ctx.fillStyle = 'rgba(0, 240, 255, 0.2)'; ctx.fillRect(finishLineX, 0, 10, canvas.height);
+            const finishLineX = worldWidth - 200;
+            
+            // 배경 트랙 그리기
+            ctx.fillStyle = '#facc15'; ctx.fillRect(finishLineX, 0, 20, worldHeight);
+            ctx.fillStyle = '#000'; for(let i=0; i<worldHeight; i+=40) ctx.fillRect(finishLineX, i, 20, 20);
+            
+            // 핵심: 시간에 비례한 목표 진행도 (Time-Sync)
+            let timeRatio = elapsed / totalGameTimeMs; // 0.0 ~ 1.0
+            let expectedX = timeRatio * finishLineX;
 
-            let maxProgress = Math.max(...entities.map(e => e.progress));
+            let leadX = 0;
 
             entities.forEach(e => {
-                if (e.finished) { renderEntity(e, 'racing'); return; }
+                if (e.finished) { renderEntity(e); return; }
 
-                let currentSpeed = e.speed;
+                // 부스터 아이템 발동 (가중치 비례 강력함)
+                if (Math.random() < 0.005) { e.status = 'boost'; e.boostMult = 2 + (e.weight * 0.3); }
+                if (Math.random() < 0.01) e.status = 'normal'; // 부스터 종료
 
-                // 타임 게이트: 일반 시간엔 90%에서 정체
-                if (!isSuddenDeath && e.progress > 85) {
-                    currentSpeed *= 0.05;
-                }
-                
-                // 서든데스: 폭발적 랜덤 부스터
-                if (isSuddenDeath) {
-                    if (Math.random() < 0.05) e.speed += (Math.random() * 0.8) + (e.weight * 0.1);
-                    currentSpeed = e.speed;
-                }
+                // 고무줄 로직 (목표 위치 대비 오차 계산)
+                let error = expectedX - e.x;
+                // 가중치가 높을수록 목표치보다 약간 앞서가려는 성질 부여
+                let weightBias = e.weight * 30; 
+                let baseSpeed = (error + weightBias) * 0.02;
 
-                // 고무줄 효과
-                if (e.progress < maxProgress - 20) currentSpeed *= 1.3;
+                if (e.status === 'boost') baseSpeed *= e.boostMult;
+                if (isSuddenDeath) baseSpeed += Math.random() * 20; // 마지막 10초 난장판
 
-                e.progress += currentSpeed;
-                e.x = 50 + (e.progress / 100) * (finishLineX - 50);
+                e.x += baseSpeed + (Math.random() * 5); // 약간의 랜덤성
+                if (e.x > leadX) leadX = e.x; // 카메라 트래킹용 선두 좌표 저장
 
                 if (e.x >= finishLineX) {
                     e.x = finishLineX; e.finished = true;
                     if (currentWinners.length < targetWinCount) currentWinners.push(e);
                 }
-                renderEntity(e, 'racing');
+                renderEntity(e);
             });
+
+            // 카메라가 선두를 따라감 (선두가 화면 중앙보다 약간 우측에 위치하도록)
+            camera.targetX = leadX - canvas.width * 0.3;
+            // 서든데스 때 화면 줌인
+            camera.targetScale = isSuddenDeath ? 1.5 : 1.2;
         }
 
-        // 2. 핀볼
+        // --- 2. 마블 드롭 엔진 (Time-Sync) ---
         function updatePinball(elapsed, isSuddenDeath, targetWinCount) {
-            // 장애물 그리기
-            ctx.fillStyle = isSuddenDeath ? '#ff0055' : '#00f0ff';
+            ctx.fillStyle = '#00f0ff';
             pegs.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2); ctx.fill(); });
 
-            // 하단 당첨 슬롯
-            const slotHeight = 80;
-            ctx.fillStyle = 'rgba(250, 204, 21, 0.3)'; ctx.fillRect(0, canvas.height - slotHeight, canvas.width, slotHeight);
-            ctx.fillStyle = '#facc15'; ctx.font = '24px Orbitron'; ctx.textAlign = 'center';
-            ctx.fillText("WINNER ZONE", canvas.width/2, canvas.height - 30);
+            const slotY = worldHeight - 200;
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.4)'; ctx.fillRect(0, slotY, worldWidth, 200);
+
+            let timeRatio = elapsed / totalGameTimeMs;
+            let expectedY = timeRatio * slotY;
+            let lowestY = 0;
 
             entities.forEach(e => {
-                if (e.finished) { renderEntity(e, 'pinball'); return; }
+                if (e.finished) { renderEntity(e); return; }
 
-                // 서든데스 시 미친 중력
-                e.vy += isSuddenDeath ? 0.8 : 0.15; 
+                let error = expectedY - e.y;
+                let gravity = (error + e.weight * 20) * 0.001; 
+                
+                e.vy += gravity;
+                if (e.status === 'boost') e.vy += 5;
+                if (Math.random() < 0.005) { e.status = 'boost'; e.vx += (Math.random()-0.5)*30; }
+                if (Math.random() < 0.02) e.status = 'normal';
+
                 e.x += e.vx; e.y += e.vy;
+                e.vx *= 0.98; // 공기 저항
 
                 // 벽 충돌
-                if (e.x < e.radius || e.x > canvas.width - e.radius) { e.vx *= -0.8; e.x = Math.max(e.radius, Math.min(e.x, canvas.width - e.radius)); }
+                if (e.x < e.radius || e.x > worldWidth - e.radius) { e.vx *= -1; e.x = Math.max(e.radius, Math.min(e.x, worldWidth - e.radius)); }
 
-                // 페그(장애물) 충돌
-                if (!isSuddenDeath) { // 서든데스엔 장애물 무시하고 수직 낙하
-                    pegs.forEach(p => {
-                        const dx = e.x - p.x; const dy = e.y - p.y;
-                        const dist = Math.hypot(dx, dy);
-                        if (dist < e.radius + p.radius) {
-                            const angle = Math.atan2(dy, dx);
-                            e.vx += Math.cos(angle) * 3; e.vy = Math.sin(angle) * 3;
-                        }
-                    });
-                }
+                // 장애물 충돌
+                pegs.forEach(p => {
+                    const dx = e.x - p.x; const dy = e.y - p.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < e.radius + p.radius) {
+                        const angle = Math.atan2(dy, dx);
+                        e.vx += Math.cos(angle) * 5; e.vy = Math.sin(angle) * 5;
+                    }
+                });
 
-                // 타임 게이트: 시간 안 됐으면 바닥 닿기 전 강제 점프
-                if (!isSuddenDeath && e.y > canvas.height - slotHeight - 50) {
-                    e.vy = -12 - Math.random() * 8; e.vx = (Math.random() - 0.5) * 15;
-                }
+                if (e.y > lowestY) lowestY = e.y;
 
-                // 당첨
-                if (e.y > canvas.height - 20) {
-                    e.y = canvas.height - 20; e.vy = 0; e.vx = 0; e.finished = true;
+                if (e.y > slotY) {
+                    e.y = slotY; e.vy = 0; e.vx = 0; e.finished = true;
                     if (currentWinners.length < targetWinCount) currentWinners.push(e);
                 }
-                renderEntity(e, 'pinball');
+                renderEntity(e);
             });
+
+            // 카메라가 가장 아래에 있는 공을 따라감
+            camera.targetY = lowestY - canvas.height * 0.4;
+            camera.targetScale = isSuddenDeath ? 1.3 : 1.0;
         }
 
-        // 3. 로얄 럼블 (배틀그라운드 룰: 최후의 생존자가 우승)
+        // --- 3. 로얄 럼블 엔진 ---
         function updateWrestling(elapsed, isSuddenDeath, targetWinCount, prize) {
-            const cx = canvas.width / 2; const cy = canvas.height / 2;
+            const cx = worldWidth / 2; const cy = worldHeight / 2;
+            let timeRatio = elapsed / totalGameTimeMs;
             
-            // 링 크기 조절
-            let ringRadius = 350;
-            if (elapsed > totalGameTimeMs * 0.3) {
-                const shrinkRatio = (elapsed - totalGameTimeMs*0.3) / (totalGameTimeMs*0.7);
-                ringRadius = Math.max(0, 350 - (350 * shrinkRatio)); // 서든데스 땐 0으로 수렴
-            }
+            // 링은 시간에 따라 점점 좁아짐
+            let ringRadius = Math.max(50, (Math.min(canvas.width, canvas.height)/2) * (1 - timeRatio * 0.8));
             
             ctx.beginPath(); ctx.arc(cx, cy, ringRadius, 0, Math.PI*2);
-            ctx.strokeStyle = isSuddenDeath ? '#ff0055' : '#00f0ff'; ctx.lineWidth = 5; ctx.stroke();
+            ctx.strokeStyle = isSuddenDeath ? '#ff0055' : '#00f0ff'; ctx.lineWidth = 10; ctx.stroke();
             ctx.fillStyle = isSuddenDeath ? 'rgba(255,0,85,0.1)' : 'rgba(0,240,255,0.05)'; ctx.fill();
 
             let alive = entities.filter(e => !e.eliminated);
@@ -475,81 +442,72 @@
                 e.x += e.vx; e.y += e.vy;
                 e.vx *= 0.95; e.vy *= 0.95;
 
-                // 링 밖으로 나가면 탈락 (Eliminated)
-                const distFromCenter = Math.hypot(e.x - cx, e.y - cy);
-                if (distFromCenter > ringRadius) {
-                    e.eliminated = true;
-                    // 남은 인원이 딱 뽑아야 할 인원이면 게임 종료 트리거
-                    if (entities.filter(en => !en.eliminated).length === targetWinCount) {
+                const dist = Math.hypot(e.x - cx, e.y - cy);
+                if (dist > ringRadius) {
+                    e.eliminated = true; // 링 밖으로 나가면 사망
+                    if (entities.filter(en => !en.eliminated).length <= targetWinCount) {
                         currentWinners = entities.filter(en => !en.eliminated);
                         finalizeGame(targetWinCount, prize);
                     }
                 } else {
-                    // 중앙 인력
-                    e.vx += (cx - e.x) * 0.002; e.vy += (cy - e.y) * 0.002;
+                    e.vx += (cx - e.x) * 0.001; e.vy += (cy - e.y) * 0.001; // 중앙 인력
                 }
 
-                // 충돌 처리
+                // 난투극 충돌
                 alive.forEach(other => {
-                    if (e !== other) {
-                        const dx = other.x - e.x; const dy = other.y - e.y;
-                        const dist = Math.hypot(dx, dy);
-                        if (dist < e.radius + other.radius) {
-                            const angle = Math.atan2(dy, dx);
-                            const force = (e.weight * 0.5) + Math.random() * 2;
-                            other.vx += Math.cos(angle) * force; other.vy += Math.sin(angle) * force;
-                        }
+                    if (e !== other && Math.hypot(other.x - e.x, other.y - e.y) < e.radius + other.radius) {
+                        const angle = Math.atan2(other.y - e.y, other.x - e.x);
+                        const force = (e.weight * 0.8) + Math.random() * 5; // 가중치가 높을수록 튕겨내는 힘 막강
+                        other.vx += Math.cos(angle) * force; other.vy += Math.sin(angle) * force;
                     }
                 });
-                renderEntity(e, 'wrestling');
+                renderEntity(e);
             });
-            
-            // 타임오버 시 중앙에 가장 가까운 생존자들이 우승
+
+            // 카메라 줌인 (링이 좁아질수록 확대)
+            camera.targetScale = Math.min(3, 1 + (timeRatio * 1.5));
+            camera.targetX = 0; camera.targetY = 0;
+
             if (elapsed >= totalGameTimeMs && gameActive) {
-                alive.sort((a,b) => Math.hypot(a.x-cx, a.y-cy) - Math.hypot(b.x-cx, b.y-cy));
                 currentWinners = alive.slice(0, targetWinCount);
                 finalizeGame(targetWinCount, prize);
             }
         }
 
-        // 공통 렌더링
-        function renderEntity(e, mode) {
+        function renderEntity(e) {
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            if (mode === 'racing') {
-                const fontSize = Math.max(16, canvas.height / participants.length * 0.7);
-                ctx.font = `${fontSize}px Arial`; ctx.fillText(e.avatar, e.x, e.y);
-                ctx.font = `bold ${fontSize*0.7}px "Noto Sans KR"`;
+            if (gameMode === 'racing') {
+                const fSize = Math.max(16, worldHeight / participants.length * 0.8);
+                if(e.status === 'boost') { ctx.font = `${fSize*1.5}px Arial`; ctx.fillText('🔥', e.x-fSize, e.y); }
+                ctx.font = `${fSize}px Arial`; ctx.fillText(e.avatar, e.x, e.y);
+                ctx.font = `900 ${fSize*0.7}px "Noto Sans KR"`;
                 ctx.fillStyle = e.finished ? '#facc15' : '#fff';
-                ctx.textAlign = 'left'; 
-                ctx.fillText(e.name, e.x + fontSize, e.y); // 이름 길이 관계없이 전부 그림
+                ctx.textAlign = 'left'; ctx.fillText(e.name, e.x + fSize, e.y);
             } else {
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.radius, 0, Math.PI*2);
                 ctx.fillStyle = e.color; ctx.fill();
-                ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+                ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
                 
-                // 폰트 크기 동적 조절로 네 글자 이름도 원 안에 욱여넣음
-                const fontSize = Math.max(8, e.radius * 0.7);
-                ctx.fillStyle = '#fff'; ctx.font = `bold ${fontSize}px "Noto Sans KR"`;
-                ctx.fillText(e.name, e.x, e.y); 
+                const fSize = Math.max(10, e.radius * 0.6);
+                ctx.fillStyle = '#fff'; ctx.font = `900 ${fSize}px "Noto Sans KR"`;
+                // 이름이 4글자든 5글자든 원 크기에 맞춰 출력 (가운데 두글자 정도만 보여줌)
+                ctx.fillText(e.name.substring(0,3), e.x, e.y); 
             }
         }
 
-        // 결과 모달창
         function showResult(prize) {
             timerUI.style.display = 'none';
             document.getElementById('modalPrizeTitle').innerText = `[ ${prize} ]`;
             
-            // 등수 매칭하여 UI 표시
-            const listHtml = currentWinners.map((w, idx) => `
+            // 1등, 2등 등수 매칭 UI
+            document.getElementById('winnerNames').innerHTML = currentWinners.map((w, idx) => `
                 <div class="winner-card">
                     <div class="rank-badge">${idx + 1}등</div>
                     <div class="winner-name">${w.name}</div>
                 </div>
             `).join('');
             
-            document.getElementById('winnerNames').innerHTML = listHtml;
             document.getElementById('resultModal').style.display = 'flex';
-            document.getElementById('btnStartGame').disabled = false;
         }
 
         document.getElementById('btnCloseModal').addEventListener('click', function() {
@@ -560,10 +518,13 @@
             document.getElementById('poolDisplay').innerText = `${participants.length} 명 대기중`;
             document.getElementById('resultModal').style.display = 'none';
             document.getElementById('prizeTitle').value = ""; 
-            drawIdleScreen();
             
-            // 전체화면 해제 (옵션)
-            // if (document.exitFullscreen) document.exitFullscreen();
+            // UI 복귀
+            sidebar.classList.remove('hidden');
+            document.body.classList.remove('game-active');
+            setTimeout(resizeCanvas, 500);
+            drawIdleScreen();
+            exitFullscreen();
         });
 
         document.getElementById('btnExportCSV').addEventListener('click', function() {
