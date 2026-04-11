@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:,">
-    <title>MX e-Sports Raffle System v9</title>
+    <title>MX e-Sports Raffle System v10</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800;900&family=Noto+Sans+KR:wght@400;700;900&display=swap');
         
@@ -21,12 +21,10 @@
             transition: background 0.8s ease;
         }
 
-        /* 고급스러운 모드별 배경 */
         body.mode-racing { background: radial-gradient(circle at 50% -20%, #0d1b2a 0%, var(--bg-base) 80%); }
         body.mode-pinball { background: radial-gradient(circle at 50% -20%, #240046 0%, var(--bg-base) 80%); }
         body.mode-wrestling { background: radial-gradient(circle at 50% 50%, #370617 0%, var(--bg-base) 80%); }
 
-        /* 좌측 컨트롤 패널 (시네마틱 전환 애니메이션) */
         .sidebar {
             position: absolute; left: 20px; top: 20px; bottom: 20px; width: 340px;
             background: var(--panel-bg); padding: 25px; border-radius: 20px;
@@ -38,7 +36,6 @@
         
         .sidebar.hidden { transform: translateX(-120%); opacity: 0; pointer-events: none; }
 
-        /* 메인 캔버스 영역 */
         .main {
             flex: 1; position: relative; width: 100vw; height: 100vh;
             background: transparent; overflow: hidden;
@@ -78,7 +75,6 @@
         
         #poolDisplay { font-size: 20px; text-align: center; font-weight: 900; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--glass-border); }
 
-        /* 인게임 UI */
         .ingame-ui {
             position: absolute; right: 30px; top: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; z-index: 10; opacity: 0; transition: opacity 0.5s; pointer-events: none;
         }
@@ -91,23 +87,24 @@
         .time-warning { color: var(--accent-magenta) !important; text-shadow: 0 0 20px var(--accent-magenta), 0 0 40px var(--accent-magenta) !important; animation: pulse 0.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
-        /* 직관적인 계급장 패널 (로얄럼블 전용) */
         .legend-panel {
             background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
             border-radius: 12px; padding: 15px; color: #ccc; font-size: 13px; font-weight: bold;
-            display: none; flex-direction: column; gap: 8px;
+            display: flex; flex-direction: column; gap: 8px;
         }
         .legend-item { display: flex; align-items: center; gap: 10px; }
         .legend-icon { font-size: 20px; width: 30px; text-align: center; }
 
         canvas { display: block; width: 100%; height: 100%; }
 
-        /* 결과 모달 */
         .modal {
             position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(25px);
             display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
+            opacity: 0; transition: opacity 0.5s ease;
         }
+        .modal.show { display: flex; opacity: 1; }
         .modal h1 { font-family: 'Orbitron', sans-serif; color: var(--accent-gold); font-size: 6em; margin: 0 0 10px 0; text-shadow: 0 0 50px rgba(250, 204, 21, 0.6); }
+        
         .winner-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
             width: 80%; max-width: 1000px; max-height: 50vh; overflow-y: auto; margin: 30px 0; padding: 10px;
@@ -130,7 +127,7 @@
         
         <label>1. 참가자 명단 (이름 점수)</label>
         <textarea id="nameInput" rows="7" placeholder="이범준10&#10;홍길동 3&#10;권나라"></textarea>
-        <button type="button" class="action-btn" id="btnUpdateData" style="padding: 14px; font-size: 15px;">데이터 적용</button>
+        <button type="button" class="action-btn" id="btnUpdateData" style="padding: 14px; font-size: 15px;">데이터 파싱</button>
         <div id="poolDisplay">0 명 대기중</div>
         
         <hr style="width:100%; border: 0; border-top: 1px solid var(--glass-border);">
@@ -157,10 +154,10 @@
         <div class="ingame-ui" id="inGameUI">
             <div id="gameTimer">00:00</div>
             <div class="legend-panel" id="legendPanel">
-                <div class="legend-item"><span class="legend-icon">🦸‍♂️</span> 10점 이상 (슈퍼맨)</div>
-                <div class="legend-item"><span class="legend-icon">🦹‍♂️</span> 6~9점 (빌런)</div>
-                <div class="legend-item"><span class="legend-icon">🦍</span> 3~5점 (고릴라)</div>
-                <div class="legend-item"><span class="legend-icon">🧍</span> 그 외 (도전자)</div>
+                <div class="legend-item"><span class="legend-icon" id="lg-1">🚀</span> 10점 이상 (압도적)</div>
+                <div class="legend-item"><span class="legend-icon" id="lg-2">🏎️</span> 6~9점 (강력)</div>
+                <div class="legend-item"><span class="legend-icon" id="lg-3">🚗</span> 3~5점 (우세)</div>
+                <div class="legend-item"><span class="legend-icon" id="lg-4">🏃</span> 그 외 (도전자)</div>
             </div>
         </div>
         <canvas id="gameCanvas"></canvas>
@@ -170,16 +167,16 @@
         <h1>WINNERS</h1>
         <h2 id="modalPrizeTitle" style="font-size: 2.5em; margin:0; color: #fff;"></h2>
         <div class="winner-grid" id="winnerNames"></div>
-        <button type="button" class="action-btn" id="btnCloseModal" style="width: auto; padding: 20px 60px; font-size: 20px;">당첨자 확정 & 로비 복귀</button>
+        <button type="button" class="action-btn" id="btnCloseModal" style="width: auto; padding: 20px 60px; font-size: 20px;">당첨자 제외 및 복귀</button>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d', { alpha: false }); // 렌더링 성능 최적화
+        const ctx = canvas.getContext('2d', { alpha: false }); 
         const timerUI = document.getElementById('gameTimer');
         const inGameUI = document.getElementById('inGameUI');
-        const legendPanel = document.getElementById('legendPanel');
         const sidebar = document.getElementById('controlPanel');
+        const resultModal = document.getElementById('resultModal');
         
         let participants = [], finalWinners = [], entities = [], currentWinners = [], pegs = [];
         let animationId, gameActive = false, gameMode = 'racing';
@@ -187,6 +184,7 @@
         
         let camera = { x: 0, y: 0, targetX: 0, targetY: 0, scale: 1, targetScale: 1 };
         let worldWidth = 0, worldHeight = 0;
+        let finishProcessed = false;
 
         function resizeCanvas() {
             canvas.width = canvas.parentElement.clientWidth;
@@ -201,10 +199,20 @@
                 this.classList.add('active');
                 gameMode = this.getAttribute('data-mode');
                 document.body.className = `mode-${gameMode}`;
+                updateLegend();
             });
         });
 
-        // 계급장(아바타) 배정 로직 통합
+        function updateLegend() {
+            if (gameMode === 'wrestling') {
+                document.getElementById('lg-1').innerText = '🦸‍♂️'; document.getElementById('lg-2').innerText = '🦹‍♂️';
+                document.getElementById('lg-3').innerText = '🦍'; document.getElementById('lg-4').innerText = '🧍';
+            } else {
+                document.getElementById('lg-1').innerText = '🚀'; document.getElementById('lg-2').innerText = '🏎️';
+                document.getElementById('lg-3').innerText = '🚗'; document.getElementById('lg-4').innerText = '🏃';
+            }
+        }
+
         function getAvatar(weight, mode) {
             if (mode === 'wrestling') {
                 if (weight >= 10) return '🦸‍♂️'; if (weight >= 6) return '🦹‍♂️';
@@ -239,17 +247,17 @@
             if (participants.length < qty) { alert("참가자가 부족합니다."); return; }
             if (!prize) { alert("상품명을 입력하세요."); return; }
 
-            // 시네마틱 UI 전환
             goFullscreen();
             sidebar.classList.add('hidden');
             inGameUI.classList.add('visible');
-            legendPanel.style.display = gameMode === 'wrestling' ? 'flex' : 'none';
             setTimeout(resizeCanvas, 400); 
 
+            // 시간 동기화 (최소 30초, 최대 120초)
             totalGameTimeMs = Math.max(30000, Math.min(120000, participants.length * 300));
             suddenDeathTimeMs = totalGameTimeMs - 10000;
 
             currentWinners = [];
+            finishProcessed = false;
             initWorldAndEntities();
             startTime = Date.now();
             gameActive = true;
@@ -272,16 +280,18 @@
             else if (gameMode === 'pinball') {
                 worldWidth = canvas.width; worldHeight = canvas.height * 4;
                 pegs = [];
-                // 복합 지형 생성 (깔때기 모양 및 랜덤 점)
-                for (let y = 300; y < worldHeight - 400; y += 120) {
-                    for (let x = 50; x < worldWidth; x += 120) {
-                        if (Math.random() > 0.3) pegs.push({ x: x + (Math.random()*60), y: y + (Math.random()*60), radius: 12, type: 'normal' });
+                
+                // 다이나믹 장애물 생성 (일반 Peg, 기어, 액티브 범퍼)
+                for (let y = 300; y < worldHeight - 300; y += 120) {
+                    for (let x = 50; x < worldWidth; x += 150) {
+                        if (Math.random() > 0.4) {
+                            pegs.push({ x: x + (Math.random()*60), y: y + (Math.random()*60), radius: 15, type: 'normal', flash: 0 });
+                        }
                     }
-                    // 깔때기 지형
-                    if (y % 400 < 100) {
-                        pegs.push({ x: worldWidth*0.2, y: y, radius: 25, type: 'bumper' });
-                        pegs.push({ x: worldWidth*0.8, y: y, radius: 25, type: 'bumper' });
-                    }
+                    // 중앙부 톱니바퀴 & 양옆 액티브 범퍼
+                    pegs.push({ x: worldWidth/2, y: y + 60, radius: 40, type: 'gear', angle: 0 });
+                    pegs.push({ x: worldWidth*0.2, y: y, radius: 25, type: 'bumper', flash: 0 });
+                    pegs.push({ x: worldWidth*0.8, y: y, radius: 25, type: 'bumper', flash: 0 });
                 }
                 
                 entities = participants.map((p, i) => ({
@@ -308,19 +318,19 @@
             timerUI.innerText = `00:${remaining.toString().padStart(2, '0')}`;
             const isSuddenDeath = elapsed >= suddenDeathTimeMs;
             
-            if (isSuddenDeath) timerUI.classList.add('time-warning');
+            if (isSuddenDeath && !finishProcessed) timerUI.classList.add('time-warning');
             else timerUI.classList.remove('time-warning');
 
-            if (elapsed >= totalGameTimeMs && gameMode !== 'wrestling') {
-                finalizeGame(targetWinCount, prize); return;
+            // 타임오버 시 종료 프로세스 트리거 (렉 방지)
+            if (elapsed >= totalGameTimeMs && gameMode !== 'wrestling' && !finishProcessed) {
+                triggerFinish(targetWinCount, prize); 
             }
 
-            // 부드러운 카메라 러프
+            // 카메라 스무딩 (결승선 렉 해결을 위해 타겟 추적 부드럽게)
             camera.x += (camera.targetX - camera.x) * 0.08;
             camera.y += (camera.targetY - camera.y) * 0.08;
             camera.scale += (camera.targetScale - camera.scale) * 0.05;
 
-            // 배경 클리어 (성능 향상을 위해 단색 필)
             ctx.fillStyle = gameMode === 'racing' ? '#0d1b2a' : gameMode === 'pinball' ? '#240046' : '#370617';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
@@ -335,23 +345,29 @@
 
             ctx.restore();
 
-            if (gameActive) {
-                if (currentWinners.length >= targetWinCount && gameMode !== 'wrestling') finalizeGame(targetWinCount, prize);
-                else animationId = requestAnimationFrame(() => gameLoop(targetWinCount, prize));
-            }
+            animationId = requestAnimationFrame(() => gameLoop(targetWinCount, prize));
         }
 
-        function finalizeGame(targetWinCount, prize) {
-            gameActive = false;
+        // 카메라를 멈추고 1.5초 딜레이 후 모달창을 띄우는 함수 (렉 해소 및 연출)
+        function triggerFinish(targetWinCount, prize) {
+            finishProcessed = true;
             document.getElementById('gameContainer').classList.remove('shake-active');
+            timerUI.classList.remove('time-warning');
             
+            // 부족한 승자 채우기
             if (currentWinners.length < targetWinCount) {
                 let sorted = [];
                 if (gameMode === 'racing') sorted = entities.filter(e => !e.finished).sort((a,b) => b.x - a.x);
                 if (gameMode === 'pinball') sorted = entities.filter(e => !e.finished).sort((a,b) => b.y - a.y);
                 currentWinners.push(...sorted.slice(0, targetWinCount - currentWinners.length));
             }
-            setTimeout(() => showResult(prize), 1000);
+
+            // 1.5초 후 게임 루프 종료 및 결과창 표시
+            setTimeout(() => {
+                gameActive = false;
+                cancelAnimationFrame(animationId);
+                showResult(prize);
+            }, 1500);
         }
 
         // --- 1. 레이싱 엔진 ---
@@ -361,38 +377,32 @@
             
             let timeRatio = elapsed / totalGameTimeMs;
             let expectedX = timeRatio * finishLineX;
-            let leadX = 0;
-            
-            // 순위 기반 고무줄 로직용
-            let allX = entities.map(e => e.x).sort((a,b)=>b-a);
+            let leadX = finishProcessed ? camera.targetX + canvas.width*0.3 : 0; // 종료 시 선두 고정
             
             entities.forEach(e => {
                 if (e.finished) { renderEntity(e); return; }
 
-                let rank = allX.indexOf(e.x); 
-                let isBehind = rank > entities.length * 0.5; // 하위 50% 여부
-
-                // 부스터 확률 차등 적용 (하위권일수록 잘 터짐)
-                let boostChance = isBehind ? 0.015 : 0.002; 
-                if (e.boostTimer <= 0 && Math.random() < boostChance) {
-                    e.status = 'boost';
-                    e.boostTimer = 30 + Math.random() * 30; // 지속 시간
+                // 부스터 확률 극소화 (공정성). 단 가중치가 높을 때 효율 극대화
+                if (e.boostTimer <= 0 && Math.random() < 0.002) {
+                    e.status = 'boost'; e.boostTimer = 30 + Math.random() * 20;
                 }
 
                 let error = expectedX - e.x;
-                let baseSpeed = (error + (e.weight * 20)) * 0.015;
+                // 가중치가 높을수록 기본 베이스 스피드 한계가 높음
+                let baseSpeed = (error + (e.weight * 30)) * 0.012;
 
                 if (e.status === 'boost') {
-                    // 가중치 높을수록 부스터 효율이 좋음 (기본 속도의 2~5배)
-                    baseSpeed += (2 + e.weight * 0.3) * 3;
+                    baseSpeed += (2 + e.weight * 0.8) * 4; // 가중치 높으면 빛의 속도
                     e.boostTimer--;
                     if(e.boostTimer <= 0) e.status = 'normal';
                 }
                 
-                if (isSuddenDeath) baseSpeed += Math.random() * 25; 
+                if (isSuddenDeath) baseSpeed += Math.random() * 15; 
 
-                e.x += baseSpeed + (Math.random() * 3); 
-                if (e.x > leadX) leadX = e.x; 
+                if (!finishProcessed) {
+                    e.x += baseSpeed + (Math.random() * 2); 
+                    if (e.x > leadX) leadX = e.x; 
+                }
 
                 if (e.x >= finishLineX) {
                     e.x = finishLineX; e.finished = true;
@@ -401,51 +411,75 @@
                 renderEntity(e);
             });
 
-            camera.targetX = leadX - canvas.width * 0.3;
-            camera.targetScale = isSuddenDeath ? 1.4 : 1.1;
+            if (!finishProcessed) {
+                camera.targetX = leadX - canvas.width * 0.3;
+                camera.targetScale = isSuddenDeath ? 1.4 : 1.1;
+            }
         }
 
-        // --- 2. 핀볼 엔진 ---
+        // --- 2. 핀볼 엔진 (다이나믹 지형) ---
         function updatePinball(elapsed, isSuddenDeath, targetWinCount) {
+            // 장애물 렌더링 및 로직
             pegs.forEach(p => { 
-                ctx.fillStyle = p.type === 'bumper' ? '#ff0055' : '#00f0ff';
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2); ctx.fill(); 
+                if (p.type === 'gear') {
+                    p.angle += 0.05; // 기어 회전
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+                    ctx.fillStyle = '#ff0055'; 
+                    // 톱니바퀴 모양
+                    for(let i=0; i<8; i++) { ctx.rotate(Math.PI/4); ctx.fillRect(-5, -p.radius-5, 10, p.radius+10); }
+                    ctx.beginPath(); ctx.arc(0,0, p.radius, 0, Math.PI*2); ctx.fill();
+                    ctx.restore();
+                } else {
+                    if (p.flash > 0) {
+                        ctx.fillStyle = '#fff'; ctx.shadowBlur = 15; ctx.shadowColor = '#fff'; p.flash--;
+                    } else {
+                        ctx.fillStyle = p.type === 'bumper' ? '#facc15' : '#00f0ff'; ctx.shadowBlur = 0;
+                    }
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0;
+                }
             });
 
             const slotY = worldHeight - 150;
             ctx.fillStyle = 'rgba(250, 204, 21, 0.3)'; ctx.fillRect(0, slotY, worldWidth, 150);
 
             let timeRatio = elapsed / totalGameTimeMs;
-            let expectedY = timeRatio * slotY; // 타임 게이트 허용 Y좌표
-            let lowestY = 0;
+            let expectedY = timeRatio * slotY;
+            let lowestY = finishProcessed ? camera.targetY + canvas.height*0.4 : 0;
 
             entities.forEach(e => {
                 if (e.finished) { renderEntity(e); return; }
 
-                e.vy += 0.3; // 중력
-                e.x += e.vx; e.y += e.vy;
+                // 가중치가 높을수록 질량(중력)이 무거워져 돌파력이 좋음
+                let gravity = 0.2 + (e.weight * 0.02);
+                e.vy += isSuddenDeath ? gravity * 3 : gravity; 
+                
+                if (!finishProcessed) { e.x += e.vx; e.y += e.vy; }
                 e.vx *= 0.98;
 
                 if (e.x < e.radius || e.x > worldWidth - e.radius) { e.vx *= -0.9; e.x = Math.max(e.radius, Math.min(e.x, worldWidth - e.radius)); }
 
+                // 다이나믹 장애물 충돌
                 pegs.forEach(p => {
                     const dx = e.x - p.x; const dy = e.y - p.y;
                     const dist = Math.hypot(dx, dy);
                     if (dist < e.radius + p.radius) {
                         const angle = Math.atan2(dy, dx);
-                        const bounce = p.type === 'bumper' ? 12 : 6;
-                        e.vx += Math.cos(angle) * bounce; e.vy = Math.sin(angle) * bounce;
+                        let bounce = 5;
+                        if (p.type === 'bumper') { bounce = 15; p.flash = 10; } // 범퍼 맞으면 빛나고 강하게 튕김
+                        if (p.type === 'gear') { bounce = 20; e.vx += (Math.random()-0.5)*10; }
+                        
+                        // 무거운 공은 덜 튕겨나가며 직진함
+                        bounce -= (e.weight * 0.2); 
+                        e.vx += Math.cos(angle) * Math.max(2, bounce); e.vy = Math.sin(angle) * Math.max(2, bounce);
                     }
                 });
 
-                // 철통 타임 게이트: 예상 진행도보다 너무 빨리 떨어지면 위로 쳐올림
-                if (!isSuddenDeath && e.y > expectedY + 100) {
-                    e.y = expectedY + 100;
-                    e.vy = -10 - Math.random() * 10;
-                    e.vx += (Math.random() - 0.5) * 20;
+                // 유리천장 타임 게이트
+                if (!isSuddenDeath && e.y > expectedY + 150) {
+                    e.y = expectedY + 150; e.vy = -8 - Math.random() * 5; e.vx += (Math.random() - 0.5) * 10;
                 }
 
-                if (e.y > lowestY) lowestY = e.y;
+                if (e.y > lowestY && !finishProcessed) lowestY = e.y;
 
                 if (e.y > slotY) {
                     e.y = slotY; e.vy = 0; e.vx = 0; e.finished = true;
@@ -454,11 +488,13 @@
                 renderEntity(e);
             });
 
-            camera.targetY = lowestY - canvas.height * 0.4;
-            camera.targetScale = isSuddenDeath ? 1.3 : 1.0;
+            if (!finishProcessed) {
+                camera.targetY = lowestY - canvas.height * 0.4;
+                camera.targetScale = isSuddenDeath ? 1.3 : 1.0;
+            }
         }
 
-        // --- 3. 로얄 럼블 엔진 ---
+        // --- 3. 로얄 럼블 ---
         function updateWrestling(elapsed, isSuddenDeath, targetWinCount, prize) {
             const cx = worldWidth / 2; const cy = worldHeight / 2;
             let timeRatio = elapsed / totalGameTimeMs;
@@ -471,15 +507,15 @@
             let alive = entities.filter(e => !e.eliminated);
 
             alive.forEach(e => {
-                e.x += e.vx; e.y += e.vy;
+                if (!finishProcessed) { e.x += e.vx; e.y += e.vy; }
                 e.vx *= 0.93; e.vy *= 0.93;
 
                 const dist = Math.hypot(e.x - cx, e.y - cy);
                 if (dist > ringRadius) {
                     e.eliminated = true; 
-                    if (entities.filter(en => !en.eliminated).length <= targetWinCount) {
+                    if (entities.filter(en => !en.eliminated).length <= targetWinCount && !finishProcessed) {
                         currentWinners = entities.filter(en => !en.eliminated);
-                        finalizeGame(targetWinCount, prize);
+                        triggerFinish(targetWinCount, prize);
                     }
                 } else {
                     e.vx += (cx - e.x) * 0.003; e.vy += (cy - e.y) * 0.003; 
@@ -488,7 +524,7 @@
                 alive.forEach(other => {
                     if (e !== other && Math.hypot(other.x - e.x, other.y - e.y) < e.radius + other.radius) {
                         const angle = Math.atan2(other.y - e.y, other.x - e.x);
-                        // 가중치 기반 파워 넉백
+                        // 가중치(파워) 기반 압도적 넉백
                         const force = (e.weight * 0.8) + Math.random() * 4; 
                         other.vx += Math.cos(angle) * force; other.vy += Math.sin(angle) * force;
                     }
@@ -496,17 +532,15 @@
                 renderEntity(e);
             });
 
-            // 중앙 픽스 & 줌인
             camera.targetX = 0; camera.targetY = 0;
-            camera.targetScale = Math.min(2.5, 1 + (timeRatio * 1.5));
+            if (!finishProcessed) camera.targetScale = Math.min(2.5, 1 + (timeRatio * 1.5));
 
-            if (elapsed >= totalGameTimeMs && gameActive) {
+            if (elapsed >= totalGameTimeMs && !finishProcessed) {
                 currentWinners = alive.slice(0, targetWinCount);
-                finalizeGame(targetWinCount, prize);
+                triggerFinish(targetWinCount, prize);
             }
         }
 
-        // 공통 렌더링 (렉 최적화를 위해 shadow 삭제)
         function renderEntity(e) {
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             if (gameMode === 'racing') {
@@ -517,7 +551,6 @@
                 ctx.fillStyle = e.finished ? '#facc15' : '#fff';
                 ctx.textAlign = 'left'; ctx.fillText(e.name, e.x + fSize, e.y);
             } else if (gameMode === 'wrestling') {
-                // 로얄럼블은 아바타로 렌더링
                 const fSize = e.radius * 1.5;
                 ctx.font = `${fSize}px Arial`; ctx.fillText(e.avatar, e.x, e.y - 5);
                 ctx.font = `900 ${Math.max(10, e.radius*0.6)}px "Noto Sans KR"`;
@@ -543,8 +576,8 @@
                 </div>
             `).join('');
             
-            document.getElementById('gameContainer').classList.remove('shake-active');
-            document.getElementById('resultModal').style.display = 'flex';
+            const modal = document.getElementById('resultModal');
+            modal.classList.add('show');
         }
 
         document.getElementById('btnCloseModal').addEventListener('click', function() {
@@ -553,13 +586,11 @@
             participants = participants.filter(p => !winnerIds.includes(p.id));
             
             document.getElementById('poolDisplay').innerText = `${participants.length} 명 대기중`;
-            document.getElementById('resultModal').style.display = 'none';
+            document.getElementById('resultModal').classList.remove('show');
             document.getElementById('prizeTitle').value = ""; 
             
             sidebar.classList.remove('hidden');
             exitFullscreen();
-            
-            // 잔상 제거를 위해 캔버스 초기화
             ctx.clearRect(0,0,canvas.width,canvas.height);
         });
 
